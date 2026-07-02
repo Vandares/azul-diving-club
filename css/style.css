@@ -451,17 +451,6 @@ section { position: relative; }
   background: var(--azul-deep);
   padding: 8rem 0;
 }
-.benefits__decor {
-  position: absolute;
-  top: -60px;
-  right: -60px;
-  width: 420px;
-  height: 420px;
-  color: var(--current);
-  opacity: .12;
-  z-index: 0;
-  pointer-events: none;
-}
 .pill {
   display: inline-flex;
   align-items: center;
@@ -521,7 +510,6 @@ section { position: relative; }
 }
 @media (max-width: 640px) {
   .benefits__grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-  .benefits__decor { display: none; }
 }
 
 /* ==========================================================================
