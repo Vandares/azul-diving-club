@@ -33,7 +33,7 @@
   <ol class="depth-rail__marks">
     <li data-depth="0" class="is-active"><span class="depth-rail__num">0M</span><span class="depth-rail__label">Surface</span></li>
     <li data-depth="1"><span class="depth-rail__num">3M</span><span class="depth-rail__label">The Club</span></li>
-    <li data-depth="2"><span class="depth-rail__num">8M</span><span class="depth-rail__label">Training</span></li>
+    <li data-depth="2"><span class="depth-rail__num">8M</span><span class="depth-rail__label">Benefits</span></li>
     <li data-depth="3"><span class="depth-rail__num">18M</span><span class="depth-rail__label">Courses</span></li>
     <li data-depth="4"><span class="depth-rail__num">30M</span><span class="depth-rail__label">Captains</span></li>
     <li data-depth="5"><span class="depth-rail__num">0M</span><span class="depth-rail__label">Ascent</span></li>
@@ -48,7 +48,7 @@
 
     <nav class="main-nav" aria-label="Primary">
       <a href="#club">The Club</a>
-      <a href="#facilities">Facilities</a>
+      <a href="#facilities">Benefits</a>
       <a href="#courses">Courses</a>
       <a href="#captains">Captains</a>
       <a href="#contact">Contact</a>
@@ -66,7 +66,7 @@
   <div class="mobile-nav" id="mobile-nav" data-state="closed">
     <nav aria-label="Mobile">
       <a href="#club">The Club</a>
-      <a href="#facilities">Facilities</a>
+      <a href="#facilities">Benefits</a>
       <a href="#courses">Courses</a>
       <a href="#captains">Captains</a>
       <a href="#contact">Contact</a>
@@ -145,35 +145,50 @@
     </div>
   </section>
 
-  <!-- FACILITIES -->
-  <section class="facilities" id="facilities">
-    <div class="section-head">
-      <p class="eyebrow reveal">08M — Where You'll Train</p>
-      <svg class="eyebrow__wave reveal" viewBox="0 0 40 10" aria-hidden="true"><path d="M1 5c2.5 0 2.5-3.5 5-3.5S8.5 5 11 5s2.5-3.5 5-3.5S18.5 5 21 5s2.5-3.5 5-3.5S28.5 5 31 5s2.5-3.5 5-3.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-      <h2 class="reveal">Two places, one continuous lesson.</h2>
+  <!-- BENEFITS -->
+  <section class="benefits" id="facilities">
+    <svg class="benefits__decor" viewBox="0 0 420 420" aria-hidden="true">
+      <path d="M290 150c0 38-31 60-69 60s-69-22-69-60a69 69 0 0 1 138 0Z" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M175 210c-4 14-2 26 4 26s6-12 10-22 8-16 12-4-2 30 6 30 4-18 10-28 10-10 14 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M360 90c0 27-22 43-49 43s-49-16-49-43a49 49 0 0 1 98 0Z" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M280 133c-3 10-1 19 3 19s4-9 7-16 6-11 9-3-1 22 4 22 3-13 7-20 7-7 10 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+
+    <div class="benefits__head">
+      <span class="pill reveal">08M — Our Benefits</span>
+      <h2 class="reveal">Warm hospitality and five-star diving.</h2>
+      <p class="reveal">Every session at Azul is built around comfort and care — from the moment you arrive at the pool to the moment you surface at the beach.</p>
     </div>
 
-    <div class="facilities__grid">
-      <article class="facility facility--pool reveal">
-        <div class="facility__bg" aria-hidden="true"></div>
-        <div class="facility__scrim"></div>
-        <div class="facility__content">
-          <span class="facility__badge"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 34c3 0 3-3 6-3s3 3 6 3 3-3 6-3 3 3 6 3 3-3 6-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 26c3 0 3-3 6-3s3 3 6 3 3-3 6-3 3 3 6 3 3-3 6-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/></svg></span>
-          <span class="facility__accent"></span>
-          <h3>Training Pools</h3>
-          <p>Confined-water lessons in our own pools, at a comfortable temperature and depth, with an instructor always within arm's reach. This is where masks come off, ears get equalized, and nerves settle before anyone sees open water.</p>
-        </div>
+    <div class="benefits__grid">
+      <article class="benefit reveal">
+        <svg class="benefit__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 30c3 0 3-3 6-3s3 3 6 3 3-3 6-3 3 3 6 3 3-3 6-3 3 3 6 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 22c3 0 3-3 6-3s3 3 6 3 3-3 6-3 3 3 6 3 3-3 6-3 3 3 6 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/><rect x="10" y="8" width="4" height="9" rx="1" fill="currentColor"/></svg>
+        <h3>Own training<br>pools</h3>
       </article>
 
-      <article class="facility facility--beach reveal">
-        <img class="facility__photo" src="assets/club-sunset.jpg" srcset="assets/club-sunset-sm.jpg 700w, assets/club-sunset.jpg 1600w" sizes="(max-width: 860px) 100vw, 50vw" alt="" loading="lazy">
-        <div class="facility__scrim"></div>
-        <div class="facility__content">
-          <span class="facility__badge"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4 38c6-10 12-10 20 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M24 38c6-10 12-10 20 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M24 8v22M24 8l8 4-8 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
-          <span class="facility__accent"></span>
-          <h3>Private Beach Entry</h3>
-          <p>Walk straight off the sand into open water for guided shore dives once pool skills are second nature, with a captain beside you the whole way in.</p>
-        </div>
+      <article class="benefit reveal">
+        <svg class="benefit__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M4 38c6-10 12-10 20 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M24 38c6-10 12-10 20 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M24 8v22M24 8l8 4-8 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        <h3>Private beach<br>entry</h3>
+      </article>
+
+      <article class="benefit reveal">
+        <svg class="benefit__icon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="25" r="15" fill="none" stroke="currentColor" stroke-width="2"/><path d="M24 16v9l6 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <h3>Flexible diving<br>schedule</h3>
+      </article>
+
+      <article class="benefit reveal">
+        <svg class="benefit__icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="16" width="13" height="17" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><rect x="27" y="16" width="13" height="17" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 23h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 20c-3 0-5 2.5-5 6M40 20c3 0 5 2.5 5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <h3>Professional<br>equipment</h3>
+      </article>
+
+      <article class="benefit reveal">
+        <svg class="benefit__icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="15" y="13" width="8" height="27" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><rect x="25" y="13" width="8" height="27" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 13v-4M27 13v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <h3>Certified safety<br>standards</h3>
+      </article>
+
+      <article class="benefit reveal">
+        <svg class="benefit__icon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="15" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 40c0-8 6-13 14-13s14 5 14 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 13.5h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <h3>Professional dive<br>captains</h3>
       </article>
     </div>
   </section>

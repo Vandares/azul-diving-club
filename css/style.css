@@ -442,75 +442,86 @@ section { position: relative; }
 }
 
 /* ==========================================================================
-   Facilities
+   Benefits
    ========================================================================== */
 
-.facilities {
+.benefits {
+  position: relative;
+  overflow: hidden;
   background: var(--azul-deep);
   padding: 8rem 0;
 }
-.facilities .section-head { margin-bottom: 3.5rem; }
-.eyebrow__wave { display: block; width: 40px; height: 10px; color: var(--coral-light); margin: -.5rem 0 1.25rem; }
+.benefits__decor {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 420px;
+  height: 420px;
+  color: var(--current);
+  opacity: .12;
+  z-index: 0;
+  pointer-events: none;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: .45rem 1.1rem;
+  border-radius: 999px;
+  background: var(--current);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 1.75rem;
+}
+.benefits__head {
+  position: relative;
+  z-index: 2;
+  max-width: 640px;
+  margin: 0 0 4rem;
+  padding: 0 var(--edge);
+}
+.benefits__head h2 { margin-bottom: 1.1rem; }
+.benefits__head p { max-width: 46ch; font-size: 1.05rem; }
 
-.facilities__grid {
+.benefits__grid {
+  position: relative;
+  z-index: 2;
   max-width: 1360px;
   margin: 0 auto;
   padding: 0 var(--edge);
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.25rem;
 }
-.facility {
-  position: relative;
-  overflow: hidden;
-  border-radius: 18px;
-  min-height: 380px;
+.benefit {
+  background: var(--ink);
+  border: 1px solid rgba(244,241,232,.08);
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
+  min-height: 176px;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.facility__bg, .facility__photo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.benefit__icon { width: 32px; height: 32px; color: var(--current); }
+.benefit h3 {
+  font-family: var(--font-body);
+  font-size: .96rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--foam);
+  margin: 0;
 }
-.facility--pool .facility__bg {
-  background:
-    radial-gradient(circle at 28% 6%, rgba(79,199,214,.6), transparent 55%),
-    repeating-linear-gradient(115deg, rgba(79,199,214,.12) 0px, rgba(79,199,214,.12) 2px, transparent 2px, transparent 34px),
-    linear-gradient(200deg, #12547f 0%, #0d3a5c 45%, #071b2c 100%);
-}
-.facility__scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, rgba(7,24,38,.96) 0%, rgba(7,24,38,.82) 38%, rgba(7,24,38,.35) 68%, rgba(7,24,38,.1) 100%);
-}
-.facility__content {
-  position: relative;
-  z-index: 2;
-  padding: 2.75rem;
-  max-width: 380px;
-}
-.facility__badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border: 1.5px solid var(--current);
-  border-radius: 50%;
-  margin-bottom: 1.25rem;
-}
-.facility__badge svg { width: 26px; height: 26px; color: var(--current); }
-.facility__accent { display: block; width: 20px; height: 2px; background: var(--coral-light); margin-bottom: .9rem; }
-.facility__content h3 { margin-bottom: .75rem; color: var(--foam); }
-.facility__content p { font-size: .96rem; }
 
-@media (max-width: 860px) {
-  .facilities__grid { grid-template-columns: 1fr; }
-  .facility { min-height: 320px; }
-  .facility__content { max-width: none; padding: 2.25rem; }
+@media (max-width: 1024px) {
+  .benefits__grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .benefits__grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .benefits__decor { display: none; }
 }
 
 /* ==========================================================================
