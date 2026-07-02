@@ -465,22 +465,18 @@ section { position: relative; }
   text-transform: uppercase;
   margin-bottom: 1.75rem;
 }
-.benefits__head {
-  position: relative;
-  z-index: 2;
-  max-width: 640px;
-  margin: 0 0 4rem;
-  padding: 0 var(--edge);
-}
-.benefits__head h2 { margin-bottom: 1.1rem; }
-.benefits__head p { max-width: 46ch; font-size: 1.05rem; }
-
-.benefits__grid {
+.benefits__inner {
   position: relative;
   z-index: 2;
   max-width: 1360px;
   margin: 0 auto;
   padding: 0 var(--edge);
+}
+.benefits__head { max-width: 640px; margin-bottom: 4rem; }
+.benefits__head h2 { margin-bottom: 1.1rem; }
+.benefits__head p { max-width: 46ch; font-size: 1.05rem; }
+
+.benefits__grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 1.25rem;
