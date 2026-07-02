@@ -451,20 +451,6 @@ section { position: relative; }
   background: var(--azul-deep);
   padding: 8rem 0;
 }
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: .45rem 1.1rem;
-  border-radius: 999px;
-  background: var(--current);
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: .72rem;
-  font-weight: 600;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  margin-bottom: 1.75rem;
-}
 .benefits__inner {
   position: relative;
   z-index: 2;
