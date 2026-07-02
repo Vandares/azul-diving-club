@@ -1,7 +1,7 @@
 # Azul Diving Club
 
 Landing page for Azul Diving Club — a PADI five-star dive center with its own training
-pools, a private beach entry, and licensed boat captains.
+pools, a private beach entry, and certified dive captains.
 
 Static site: plain HTML, CSS, and vanilla JS. No build step, no framework, no dependencies.
 
