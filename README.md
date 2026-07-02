@@ -31,11 +31,3 @@ Then open the printed local URL.
 3. Framework preset: **Other** (static site). No build command, no output directory needed —
    `index.html` is already at the project root.
 4. Deploy.
-
-## Before going live
-
-A few placeholders in `index.html` should be swapped for the real details:
-
-- Footer address (currently "Red Sea Coast, Egypt")
-- Phone number and email in the footer
-- Social links (Instagram / Facebook / WhatsApp `href="#"` placeholders)
