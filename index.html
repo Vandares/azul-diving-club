@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azul Diving Club — PADI Five Star Dive Center</title>
+<meta name="description" content="Azul Diving Club: a PADI five-star dive center with its own training pools, a private beach entry, and licensed captains — everything from a first breath underwater to open-water certification, in one place.">
+
+<meta property="og:title" content="Azul Diving Club — PADI Five Star Dive Center">
+<meta property="og:description" content="Our own pools, our own beach, our own captains. Azul means blue — everything here is built around it.">
+<meta property="og:image" content="assets/hero-diver.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#071826">
+
+<link rel="icon" type="image/png" href="assets/favicon-src.png">
+<link rel="apple-touch-icon" href="assets/favicon-src.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter+Tight:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- Depth rail: signature scroll device, mirrors real dive depth as the visitor goes further into the club -->
+<aside class="depth-rail" aria-hidden="true">
+  <div class="depth-rail__track">
+    <div class="depth-rail__fill"></div>
+  </div>
+  <ol class="depth-rail__marks">
+    <li data-depth="0" class="is-active"><span class="depth-rail__num">0M</span><span class="depth-rail__label">Surface</span></li>
+    <li data-depth="1"><span class="depth-rail__num">3M</span><span class="depth-rail__label">The Club</span></li>
+    <li data-depth="2"><span class="depth-rail__num">8M</span><span class="depth-rail__label">Training</span></li>
+    <li data-depth="3"><span class="depth-rail__num">18M</span><span class="depth-rail__label">Courses</span></li>
+    <li data-depth="4"><span class="depth-rail__num">30M</span><span class="depth-rail__label">Captains</span></li>
+    <li data-depth="5"><span class="depth-rail__num">0M</span><span class="depth-rail__label">Ascent</span></li>
+  </ol>
+</aside>
+
+<header class="site-header" id="top">
+  <div class="site-header__inner">
+    <a class="brand" href="#top">
+      <img src="assets/logo.png" width="180" height="97" alt="Azul Diving Club">
+    </a>
+
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#club">The Club</a>
+      <a href="#facilities">Facilities</a>
+      <a href="#courses">Courses</a>
+      <a href="#captains">Captains</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="site-header__actions">
+      <a class="btn btn--coral btn--sm" href="#contact">Book a Dive</a>
+      <button class="nav-toggle" aria-expanded="false" aria-controls="mobile-nav" id="navToggle">
+        <span></span><span></span><span></span>
+        <span class="sr-only">Menu</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-nav" id="mobile-nav" data-state="closed">
+    <nav aria-label="Mobile">
+      <a href="#club">The Club</a>
+      <a href="#facilities">Facilities</a>
+      <a href="#courses">Courses</a>
+      <a href="#captains">Captains</a>
+      <a href="#contact">Contact</a>
+      <a class="btn btn--coral" href="#contact">Book a Dive</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero__media">
+      <img class="hero__photo" src="assets/hero-diver.jpg" srcset="assets/hero-diver-sm.jpg 800w, assets/hero-diver.jpg 1920w" sizes="100vw" alt="A freediver descending through sunlit open water, exhaling a trail of bubbles" fetchpriority="high">
+      <canvas class="hero__caustics" id="causticsCanvas" aria-hidden="true"></canvas>
+      <div class="hero__scrim"></div>
+    </div>
+
+    <div class="hero__content">
+      <p class="eyebrow eyebrow--light">PADI Five Star Dive Center</p>
+      <h1 class="hero__headline">
+        Azul means blue.<br>
+        <span>Everything here is built around it.</span>
+      </h1>
+      <p class="hero__sub">
+        Our own training pools, a private beach entry, and licensed boat captains standing by —
+        everything a diver needs, from a first breath underwater to an open-water certification,
+        in one place.
+      </p>
+      <div class="hero__actions">
+        <a class="btn btn--coral btn--lg" href="#contact">Book a Trial Dive</a>
+        <a class="btn btn--ghost btn--lg" href="#courses">See Courses</a>
+      </div>
+    </div>
+
+    <a class="scroll-cue" href="#club" aria-label="Scroll to next section">
+      <span></span>
+    </a>
+
+    <div class="wave-divider wave-divider--down" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64 C240,110 480,10 720,48 C960,86 1200,96 1440,56 L1440,120 L0,120 Z"/></svg>
+    </div>
+  </section>
+
+  <!-- THE CLUB -->
+  <section class="club" id="club">
+    <div class="club__grid">
+      <figure class="club__figure reveal">
+        <img src="assets/club-sunset.jpg" srcset="assets/club-sunset-sm.jpg 700w, assets/club-sunset.jpg 1600w" sizes="(max-width: 800px) 100vw, 45vw" alt="The Azul Diving Club banner at sunset on the beach, flying beside a PADI flag" loading="lazy">
+      </figure>
+
+      <div class="club__copy">
+        <p class="eyebrow reveal">03M — The Club</p>
+        <h2 class="reveal">A five-star club, built the way instructors wish every dive center were.</h2>
+        <p class="reveal">
+          Azul runs its own training pools and a private beach entry, so lessons start in calm,
+          controlled water before anyone touches open sea. When it's time to go further, our boats
+          and licensed captains take you out — no shuttling between operators, no borrowed gear,
+          no guesswork.
+        </p>
+        <p class="reveal">
+          It's the same principle behind the five-star rating: everything a diving trip usually
+          scatters across three different companies, kept under one flag.
+        </p>
+        <ul class="club__facts reveal">
+          <li>Own training pools</li>
+          <li>Private beach entry</li>
+          <li>Licensed boat captains</li>
+          <li>PADI five-star affiliated</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="wave-divider wave-divider--down alt" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,56 C240,20 480,100 720,64 C960,28 1200,90 1440,48 L1440,120 L0,120 Z"/></svg>
+    </div>
+  </section>
+
+  <!-- FACILITIES -->
+  <section class="facilities" id="facilities">
+    <div class="section-head">
+      <p class="eyebrow reveal">08M — Where You'll Train</p>
+      <h2 class="reveal">Three places, one continuous lesson.</h2>
+    </div>
+
+    <div class="facilities__grid">
+      <article class="facility facility--wide reveal">
+        <svg class="facility__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 34c3 0 3-3 6-3s3 3 6 3 3-3 6-3 3 3 6 3 3-3 6-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 26c3 0 3-3 6-3s3 3 6 3 3-3 6-3 3 3 6 3 3-3 6-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/><rect x="10" y="10" width="4" height="10" rx="1" fill="currentColor"/></svg>
+        <h3>Training Pools</h3>
+        <p>Confined-water lessons in our own pools, at a comfortable temperature and depth, with an instructor always within arm's reach. This is where masks come off, ears get equalized, and nerves settle before anyone sees open water.</p>
+      </article>
+
+      <article class="facility reveal">
+        <svg class="facility__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M4 38c6-10 12-10 20 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M24 38c6-10 12-10 20 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M24 8v22M24 8l8 4-8 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        <h3>Private Beach Entry</h3>
+        <p>Walk straight off the sand into open water for guided shore dives once pool skills are second nature — no boat required for the first real dive.</p>
+      </article>
+
+      <article class="facility reveal">
+        <svg class="facility__icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 26h32l-4 10a4 4 0 0 1-3.8 2.7H15.8A4 4 0 0 1 12 36.7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M24 26V10M18 14h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="30" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <h3>Boat &amp; Captains</h3>
+        <p>Licensed captains run daily trips to reef and wreck sites, briefed and timed around the group already on board — not a shared schedule with strangers.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- COURSES -->
+  <section class="courses" id="courses">
+    <div class="section-head">
+      <p class="eyebrow reveal">18M — Courses</p>
+      <h2 class="reveal">Pick your depth.</h2>
+      <p class="section-head__sub reveal">Every course starts in the pool. Where it ends is up to you.</p>
+    </div>
+
+    <div class="dive-log reveal" role="table" aria-label="Course log">
+      <div class="dive-log__row dive-log__row--head" role="row">
+        <span role="columnheader">Course</span>
+        <span role="columnheader">Level</span>
+        <span role="columnheader">Working Depth</span>
+        <span role="columnheader">Duration</span>
+      </div>
+
+      <div class="dive-log__row" role="row">
+        <span role="cell" data-label="Course"><strong>Discover Scuba</strong><small>Try diving with no experience or commitment</small></span>
+        <span role="cell" data-label="Level">No experience needed</span>
+        <span role="cell" data-label="Working Depth">Pool + shallow reef</span>
+        <span role="cell" data-label="Duration">Half day</span>
+      </div>
+
+      <div class="dive-log__row" role="row">
+        <span role="cell" data-label="Course"><strong>Open Water Diver</strong><small>Your first certification</small></span>
+        <span role="cell" data-label="Level">Entry certification</span>
+        <span role="cell" data-label="Working Depth">Up to 18m</span>
+        <span role="cell" data-label="Duration">3–4 days</span>
+      </div>
+
+      <div class="dive-log__row" role="row">
+        <span role="cell" data-label="Course"><strong>Advanced Open Water</strong><small>Deep, navigation &amp; specialty dives</small></span>
+        <span role="cell" data-label="Level">Certified divers</span>
+        <span role="cell" data-label="Working Depth">Up to 30m</span>
+        <span role="cell" data-label="Duration">2–3 days</span>
+      </div>
+
+      <div class="dive-log__row" role="row">
+        <span role="cell" data-label="Course"><strong>Private &amp; Family Sessions</strong><small>Your pace, your group</small></span>
+        <span role="cell" data-label="Level">Any level</span>
+        <span role="cell" data-label="Working Depth">By arrangement</span>
+        <span role="cell" data-label="Duration">Flexible</span>
+      </div>
+    </div>
+
+    <div class="wave-divider wave-divider--down" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64 C240,110 480,10 720,48 C960,86 1200,96 1440,56 L1440,120 L0,120 Z"/></svg>
+    </div>
+  </section>
+
+  <!-- CAPTAINS -->
+  <section class="captains" id="captains">
+    <div class="captains__inner">
+      <p class="eyebrow eyebrow--light reveal">30M — The Team</p>
+      <blockquote class="reveal">
+        <p>Every dive is led, not just supervised.</p>
+      </blockquote>
+      <p class="captains__body reveal">
+        Our instructors and boat captains work the same water every day — they know where the
+        current pulls, when the light is best, and exactly how each first-timer is likely to
+        react the moment their face goes under. You're never handed off to whoever's free.
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA / ASCENT -->
+  <section class="cta" id="ascent">
+    <div class="cta__inner">
+      <p class="eyebrow reveal">0M — Ascent</p>
+      <h2 class="reveal">Ready when you are.</h2>
+      <p class="reveal">Bring your questions, your comfort level, your schedule — we'll fit the dive to you, not the other way around.</p>
+      <a class="btn btn--coral btn--lg reveal" href="#contact">Book a Trial Dive</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER / CONTACT -->
+<footer class="site-footer" id="contact">
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <img src="assets/logo.png" width="150" height="81" alt="Azul Diving Club" loading="lazy">
+      <p>PADI Five Star Dive Center</p>
+    </div>
+
+    <div class="site-footer__col">
+      <h3>Visit</h3>
+      <address>
+        Red Sea Coast, Egypt<br>
+        Beach &amp; pool access on site
+      </address>
+    </div>
+
+    <div class="site-footer__col">
+      <h3>Contact</h3>
+      <p><a href="tel:+20000000000">+20 000 000 0000</a></p>
+      <p><a href="mailto:dive@azuldivingclub.com">dive@azuldivingclub.com</a></p>
+    </div>
+
+    <div class="site-footer__col">
+      <h3>Follow</h3>
+      <div class="site-footer__social">
+        <a href="#" aria-label="Azul Diving Club on Instagram">Instagram</a>
+        <a href="#" aria-label="Azul Diving Club on Facebook">Facebook</a>
+        <a href="#" aria-label="Azul Diving Club on WhatsApp">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="site-footer__bottom">
+    <p>&copy; <span id="year"></span> Azul Diving Club. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
