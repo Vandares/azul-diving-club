@@ -1,0 +1,8 @@
+# Local tooling — not part of the site
+.claude/
+.mcp.json
+
+# OS cruft
+Thumbs.db
+desktop.ini
+.DS_Store

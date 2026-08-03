@@ -7,6 +7,21 @@
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  /* ---------- hero page-load sequence ----------
+     Held until the hero photo is decoded so the type never animates in over
+     an empty frame — but never held longer than 1.2s on a slow connection. */
+  const startHero = () => {
+    requestAnimationFrame(() => document.documentElement.classList.add('is-loaded'));
+  };
+  const heroPhoto = document.querySelector('.hero__photo');
+  if (heroPhoto && !heroPhoto.complete) {
+    heroPhoto.addEventListener('load', startHero, { once: true });
+    heroPhoto.addEventListener('error', startHero, { once: true });
+    setTimeout(startHero, 1200);
+  } else {
+    startHero();
+  }
+
   /* ---------- header scroll state ---------- */
   const header = document.querySelector('.site-header');
   const onScroll = () => {
@@ -84,6 +99,75 @@
     document.addEventListener('scroll', updateRail, { passive: true });
     window.addEventListener('resize', updateRail);
     updateRail();
+  }
+
+  /* ---------- depth attenuation ----------
+     Drives --depth from scroll position. Red is fully present at the surface,
+     fully absorbed at the captains (30M), and returns on the ascent — so the
+     accent colour tracks the same descent the depth rail reports. */
+  const depthStops = [
+    { sel: '#hero',       value: 0    },
+    { sel: '#club',       value: 0.18 },
+    { sel: '#facilities', value: 0.40 },
+    { sel: '#courses',    value: 0.66 },
+    { sel: '#captains',   value: 1    },
+    { sel: '#ascent',     value: 0    },
+  ]
+    .map(s => ({ el: document.querySelector(s.sel), value: s.value }))
+    .filter(s => s.el);
+
+  if (depthStops.length > 1) {
+    const root = document.documentElement;
+    let points = [];
+    let ticking = false;
+
+    const measure = () => {
+      points = depthStops.map(s => {
+        const rect = s.el.getBoundingClientRect();
+        return { pos: rect.top + window.scrollY + rect.height / 2, value: s.value };
+      });
+    };
+
+    const updateDepth = () => {
+      ticking = false;
+      const probe = window.scrollY + window.innerHeight / 2;
+      const last = points[points.length - 1];
+      let depth;
+
+      if (probe <= points[0].pos) {
+        depth = points[0].value;
+      } else if (probe >= last.pos) {
+        depth = last.value;
+      } else {
+        depth = last.value;
+        for (let i = 0; i < points.length - 1; i++) {
+          const a = points[i];
+          const b = points[i + 1];
+          if (probe >= a.pos && probe <= b.pos) {
+            const span = b.pos - a.pos;
+            const t = span > 0 ? (probe - a.pos) / span : 0;
+            /* reduced motion gets the nearest stop instead of a live blend */
+            depth = reduceMotion ? (t < 0.5 ? a.value : b.value)
+                                 : a.value + (b.value - a.value) * t;
+            break;
+          }
+        }
+      }
+
+      root.style.setProperty('--depth', depth.toFixed(3));
+    };
+
+    const onScrollDepth = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateDepth);
+    };
+
+    measure();
+    updateDepth();
+    document.addEventListener('scroll', onScrollDepth, { passive: true });
+    window.addEventListener('resize', () => { measure(); updateDepth(); });
+    window.addEventListener('load', () => { measure(); updateDepth(); });
   }
 
   /* ---------- caustics + bubbles canvas ---------- */

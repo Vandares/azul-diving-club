@@ -25,6 +25,26 @@
   --radius: 4px;
 
   --ease: cubic-bezier(.22, .61, .36, 1);
+  /* things rise fast and settle slow, the way they do in water */
+  --ease-rise: cubic-bezier(.16, 1, .3, 1);
+  --ease-settle: cubic-bezier(.33, .7, .45, 1);
+
+  /* --------------------------------------------------------------------
+     Depth attenuation.
+     Water absorbs red first — it is gone by roughly 10m, orange by 20m.
+     --depth is driven from scroll (0 at the surface, 1 at the captains,
+     back to 0 on the ascent) and bleeds the coral accent toward cyan on
+     the way down. Decorative accents only: the coral CTA stays coral so
+     the booking action never gets harder to find.
+     -------------------------------------------------------------------- */
+  --depth: 0;
+  --accent: var(--coral-light);
+}
+
+@supports (color: color-mix(in oklab, red, blue)) {
+  :root {
+    --accent: color-mix(in oklab, var(--coral-light), var(--current) calc(var(--depth) * 82%));
+  }
 }
 
 /* ==========================================================================
@@ -97,7 +117,7 @@ p { color: var(--foam-dim); }
   font-size: .78rem;
   letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--coral-light);
+  color: var(--accent);
   margin-bottom: 1rem;
   display: block;
 }
@@ -236,8 +256,8 @@ p { color: var(--foam-dim); }
   content: '';
   position: absolute; left: 0; bottom: -2px;
   width: 0; height: 1px;
-  background: var(--coral);
-  transition: width .2s var(--ease);
+  background: var(--accent);
+  transition: width .28s var(--ease-rise);
 }
 .main-nav a:hover::after { width: 100%; }
 
@@ -298,12 +318,26 @@ p { color: var(--foam-dim); }
   width: 100%; height: 100%;
   object-fit: cover;
 }
-.hero__caustics { mix-blend-mode: screen; opacity: .55; }
+/* The hero photo now carries real god-rays, so the canvas only needs to add
+   drifting bubbles and a little movement — at .55 it doubled the light. */
+.hero__caustics { mix-blend-mode: screen; opacity: .3; }
+
+/* Retuned for the 4K frame: heavier at the very top, where the sunlit surface
+   would otherwise leave the header nav sitting on blown-out white, and lighter
+   through the middle so the light shafts survive. */
 .hero__scrim {
   position: absolute; inset: 0;
   background:
-    linear-gradient(to top, var(--ink) 2%, rgba(7,24,38,.35) 42%, rgba(7,24,38,.35) 60%, rgba(7,24,38,.75) 100%),
-    linear-gradient(to right, rgba(7,24,38,.55) 0%, rgba(7,24,38,.05) 45%);
+    linear-gradient(to top,
+      var(--ink) 1%,
+      rgba(7,24,38,.60) 20%,
+      rgba(7,24,38,.20) 48%,
+      rgba(7,24,38,.34) 74%,
+      rgba(7,24,38,.88) 100%),
+    linear-gradient(to right,
+      rgba(7,24,38,.50) 0%,
+      rgba(7,24,38,.12) 40%,
+      rgba(7,24,38,0) 64%);
 }
 
 .hero__content {
@@ -332,6 +366,35 @@ p { color: var(--foam-dim); }
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+}
+
+/* Page-load sequence — one orchestrated entrance, then the hero is still.
+   Gated on html.js so the content is never hidden if the script fails. */
+.js .hero__content > *,
+.js .scroll-cue {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.js .scroll-cue { transform: translate(-50%, 20px); }
+
+.js.is-loaded .hero__content > *,
+.js.is-loaded .scroll-cue {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity .95s var(--ease-rise), transform .95s var(--ease-rise);
+}
+.js.is-loaded .scroll-cue { transform: translate(-50%, 0); }
+
+.js.is-loaded .hero__content > .eyebrow    { transition-delay: .10s; }
+.js.is-loaded .hero__content > .hero__headline { transition-delay: .22s; }
+.js.is-loaded .hero__content > .hero__sub  { transition-delay: .42s; }
+.js.is-loaded .hero__content > .hero__actions { transition-delay: .56s; }
+.js.is-loaded .scroll-cue { transition-delay: .82s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js .hero__content > *,
+  .js .scroll-cue { opacity: 1; transform: none; }
+  .js .scroll-cue { transform: translateX(-50%); }
 }
 
 .scroll-cue {
@@ -431,7 +494,7 @@ section { position: relative; }
   content: '';
   position: absolute; left: 0; top: .45em;
   width: 6px; height: 6px;
-  background: var(--coral);
+  background: var(--accent);
   border-radius: 50%;
 }
 
@@ -476,8 +539,125 @@ section { position: relative; }
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform .5s var(--ease-settle), border-color .5s var(--ease),
+              box-shadow .5s var(--ease-settle);
 }
-.benefit__icon { width: 32px; height: 32px; color: var(--current); }
+.benefit:hover {
+  transform: translateY(-6px);
+  border-color: rgba(79,199,214,.4);
+  box-shadow: 0 20px 44px -22px rgba(3,12,20,.9);
+  transition-timing-function: var(--ease-rise);
+}
+/* ---------- animated icons ----------
+   Each icon draws itself on once when its card enters view, then carries one
+   characteristic motion on hover. Six ambient loops in a row would read as
+   noise; one motion each, on demand, reads as intent. */
+
+.benefit__icon {
+  width: 34px; height: 34px;
+  color: var(--current);
+  transition: transform .5s var(--ease-settle);
+}
+.benefit:hover .benefit__icon {
+  transform: translateY(-3px);
+  transition-timing-function: var(--ease-rise);
+}
+
+.benefit__icon :is(path, circle, rect) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Draw-on. Every stroke that should draw carries pathLength="1", so one
+   dasharray works for all of them regardless of real path length.
+   The drawn state is a declaration, not animation-fill — otherwise a hover
+   animation replacing `animation` would snap the stroke back to hidden. */
+.js .benefit__icon [pathLength] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.js .benefit.is-visible .benefit__icon [pathLength] {
+  stroke-dashoffset: 0;
+  animation: icon-draw .9s var(--ease-rise);
+}
+@keyframes icon-draw { from { stroke-dashoffset: 1; } }
+
+/* Stagger only the strokes that draw — the glint and bubble groups carry
+   their own hover timing and must not inherit a draw delay. */
+.js .benefit.is-visible .benefit__icon > [pathLength]:nth-child(2),
+.js .benefit.is-visible .benefit__icon .i-bob > [pathLength]:nth-child(2),
+.js .benefit.is-visible .benefit__icon .i-drift > [pathLength]:nth-child(2) { animation-delay: .09s; }
+.js .benefit.is-visible .benefit__icon > [pathLength]:nth-child(3),
+.js .benefit.is-visible .benefit__icon .i-bob > [pathLength]:nth-child(3) { animation-delay: .18s; }
+.js .benefit.is-visible .benefit__icon > [pathLength]:nth-child(4) { animation-delay: .27s; }
+.js .benefit.is-visible .benefit__icon > [pathLength]:nth-child(5) { animation-delay: .36s; }
+
+/* 1 — the pool surface drifts */
+.i-drift { animation: icon-drift 3.4s linear infinite; animation-play-state: paused; }
+.benefit:hover .i-drift { animation-play-state: running; }
+.i-wave--b { transform: translateX(8px); opacity: .55; }
+@keyframes icon-drift { to { transform: translateX(-16px); } }
+
+/* 2 — the flag flutters, the water laps the shore */
+.i-flag { transform-box: fill-box; transform-origin: left center; }
+.benefit:hover .i-flag { animation: icon-flag 1.2s var(--ease) infinite; }
+@keyframes icon-flag {
+  0%, 100% { transform: skewY(0deg) scaleX(1); }
+  35%      { transform: skewY(-4deg) scaleX(.93); }
+  70%      { transform: skewY(3deg) scaleX(1.02); }
+}
+.benefit:hover .i-lap { animation: icon-lap 1.8s var(--ease) infinite; }
+@keyframes icon-lap {
+  0%, 100% { transform: translateX(0); opacity: .8; }
+  50%      { transform: translateX(-3px); opacity: 1; }
+}
+
+/* 3 — the hands sweep round. Transition, not animation, so the draw survives. */
+.i-hand {
+  transform-box: view-box;
+  transform-origin: 24px 27px;
+  transition: transform 1.1s var(--ease-rise);
+}
+.benefit:hover .i-hand--m { transform: rotate(360deg); }
+.benefit:hover .i-hand--h { transform: rotate(30deg); }
+
+/* 4 — light glints across the lens */
+.i-glint path { stroke: var(--foam); stroke-width: 5; }
+.i-glint { transform-box: view-box; opacity: 0; }
+.benefit:hover .i-glint { animation: icon-glint 1.2s var(--ease); }
+@keyframes icon-glint {
+  0%   { transform: translateX(-26px); opacity: 0; }
+  30%  { opacity: .45; }
+  100% { transform: translateX(44px); opacity: 0; }
+}
+
+/* 5 — bubbles leave the valves */
+.i-bubble {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.benefit:hover .i-bubble { animation: icon-bubble 1.6s var(--ease) infinite; }
+.benefit:hover .i-bubble:nth-child(2) { animation-delay: .4s; }
+.benefit:hover .i-bubble:nth-child(3) { animation-delay: .8s; }
+@keyframes icon-bubble {
+  0%   { opacity: 0; transform: translateY(3px) scale(.6); }
+  25%  { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-9px) scale(1.05); }
+}
+
+/* 6 — the captain bobs, the way you do treading water */
+.i-bob { transform-box: view-box; }
+.benefit:hover .i-bob { animation: icon-bob 2.4s var(--ease) infinite; }
+@keyframes icon-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2.5px); }
+}
 .benefit h3 {
   font-family: var(--font-body);
   font-size: .96rem;
@@ -510,6 +690,7 @@ section { position: relative; }
   padding: 0 var(--edge);
 }
 .dive-log__row {
+  position: relative;
   display: grid;
   grid-template-columns: 2fr 1.3fr 1.3fr 1fr;
   gap: 1.5rem;
@@ -526,7 +707,30 @@ section { position: relative; }
   border-bottom-color: rgba(79,199,214,.35);
   padding-top: 0;
 }
+/* Hover reads as a depth marker being set against the row, not a highlight */
+.dive-log__row:not(.dive-log__row--head) { transition: background .4s var(--ease); }
+.dive-log__row:not(.dive-log__row--head) > span { transition: transform .45s var(--ease-settle); }
+.dive-log__row:not(.dive-log__row--head)::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  width: 3px;
+  height: 0;
+  background: var(--accent);
+  border-radius: 3px;
+  transform: translateY(-50%);
+  transition: height .45s var(--ease-settle);
+}
 .dive-log__row:not(.dive-log__row--head):hover { background: rgba(244,241,232,.03); }
+.dive-log__row:not(.dive-log__row--head):hover > span {
+  transform: translateX(10px);
+  transition-timing-function: var(--ease-rise);
+}
+.dive-log__row:not(.dive-log__row--head):hover::before {
+  height: 58%;
+  transition-timing-function: var(--ease-rise);
+}
 .dive-log__row strong { display: block; font-family: var(--font-display); font-size: 1.15rem; font-weight: 500; color: var(--foam); }
 .dive-log__row small { display: block; margin-top: .25rem; color: var(--foam-dim); font-size: .85rem; }
 .dive-log__row span[data-label]:not([data-label="Course"]) { font-family: var(--font-mono); font-size: .88rem; color: var(--foam-dim); }
@@ -576,13 +780,17 @@ section { position: relative; }
 .captains__inner {
   position: relative;
   z-index: 2;
-  max-width: 900px;
+  max-width: 1360px;
   margin: 0 auto;
   padding: 0 var(--edge);
   text-align: left;
-  border-left: 2px solid var(--current);
 }
-.captains__inner blockquote p {
+.captains__lead {
+  max-width: 900px;
+  border-left: 2px solid var(--current);
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+.captains__lead blockquote p {
   font-family: var(--font-display);
   font-style: italic;
   font-size: clamp(1.6rem, 3.4vw, 2.4rem);
@@ -591,8 +799,133 @@ section { position: relative; }
   margin: 0 0 1.75rem;
   padding-left: 1.5rem;
 }
-.captains__inner .eyebrow { padding-left: 1.5rem; }
+.captains__lead .eyebrow { padding-left: 1.5rem; }
 .captains__body { padding-left: 1.5rem; max-width: 56ch; font-size: 1.05rem; }
+
+/* ---------- crew roster ---------- */
+
+.crew {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.crew__card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 1.75rem;
+  border: 1px solid rgba(244,241,232,.1);
+  border-radius: 16px;
+  background: rgba(7,24,38,.55);
+  transition: transform .55s var(--ease-settle), border-color .55s var(--ease),
+              background .55s var(--ease), box-shadow .55s var(--ease-settle);
+}
+
+/* surface light catching the card as it rises */
+.crew__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(158deg, rgba(79,199,214,.16) 0%, rgba(79,199,214,0) 58%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .55s var(--ease);
+}
+
+.crew__card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(79,199,214,.45);
+  background: rgba(7,24,38,.72);
+  box-shadow: 0 26px 56px -24px rgba(3,12,20,.95);
+  transition-timing-function: var(--ease-rise);
+}
+.crew__card:hover::before { opacity: 1; }
+
+.crew__card--lead {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: flex-start;
+  padding: 2.25rem 2rem;
+}
+.crew__card--lead .crew__head { flex: 0 0 30%; }
+
+.crew__head,
+.crew__detail { position: relative; z-index: 1; }
+.crew__detail { display: flex; flex-direction: column; flex: 1; }
+
+.crew__role {
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .65rem;
+}
+.crew__name {
+  font-size: 1.3rem;
+  line-height: 1.25;
+  margin-bottom: .45rem;
+}
+.crew__card--lead .crew__name { font-size: clamp(1.5rem, 2.4vw, 1.9rem); }
+.crew__rank {
+  font-family: var(--font-mono);
+  font-size: .76rem;
+  color: var(--current);
+}
+
+.crew__bio { font-size: .95rem; max-width: 56ch; margin-bottom: 1.15rem; }
+
+.crew__creds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+.crew__creds li {
+  font-family: var(--font-mono);
+  font-size: .68rem;
+  letter-spacing: .03em;
+  color: var(--foam-dim);
+  border: 1px solid rgba(244,241,232,.16);
+  border-radius: 999px;
+  padding: .3rem .7rem;
+  transition: border-color .55s var(--ease), color .55s var(--ease);
+}
+.crew__card:hover .crew__creds li {
+  border-color: rgba(79,199,214,.38);
+  color: var(--foam);
+}
+
+.crew__note {
+  margin-top: 1.1rem;
+  font-size: .84rem;
+  color: var(--foam-dim);
+  opacity: .72;
+  max-width: 58ch;
+}
+.crew__creed {
+  margin-top: 1.35rem;
+  padding-left: 1rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: .95rem;
+  line-height: 1.4;
+  color: rgba(244,241,232,.74);
+  border-left: 1px solid var(--accent);
+}
+
+@media (max-width: 1024px) {
+  .crew { grid-template-columns: repeat(2, 1fr); }
+  .crew__card--lead { flex-direction: column; gap: 1.5rem; }
+  .crew__card--lead .crew__head { flex: 1 1 auto; }
+}
+@media (max-width: 700px) {
+  .crew { grid-template-columns: 1fr; }
+  .captains { padding: 6rem 0; }
+}
 
 /* ==========================================================================
    CTA / Ascent
