@@ -97,7 +97,13 @@ address { font-style: normal; }
    Type
    ========================================================================== */
 
-h1, h2, h3 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em; color: var(--foam); }
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--foam);
+  text-wrap: balance;
+}
 
 h2 {
   font-size: clamp(2rem, 4vw, 3.1rem);
@@ -110,7 +116,9 @@ h3 {
   line-height: 1.2;
 }
 
-p { color: var(--foam-dim); }
+/* pretty prevents a single orphaned word on the last line of body copy;
+   balance is reserved for headings and the short pull-quote. */
+p { color: var(--foam-dim); text-wrap: pretty; }
 
 .eyebrow {
   font-family: var(--font-mono);
@@ -147,6 +155,15 @@ p { color: var(--foam-dim); }
 .btn--coral:hover { background: var(--coral-dark); }
 .btn--ghost { background: transparent; color: var(--foam); border-color: rgba(244,241,232,.35); }
 .btn--ghost:hover { border-color: var(--foam); }
+
+/* Pressed feedback. Declared after :hover so it wins while held. Touch devices
+   have no hover at all, so without this a tap gives no response whatsoever. */
+.btn:active {
+  transform: translateY(0) scale(.985);
+  transition-duration: .07s;
+}
+.btn--coral:active { background: var(--coral-dark); }
+.btn--ghost:active { background: rgba(244,241,232,.06); }
 .btn--lg { padding: 1.1rem 2.25rem; font-size: 1rem; }
 .btn--sm { padding: .6rem 1.25rem; font-size: .85rem; }
 
@@ -261,6 +278,11 @@ p { color: var(--foam-dim); }
 }
 .main-nav a:hover::after { width: 100%; }
 
+/* Current section: rule stays lit in cyan, matching the depth-rail's colour so
+   the two position indicators read as the same system. Hover still wins. */
+.main-nav a.is-current::after { width: 100%; background: var(--current); }
+.main-nav a.is-current:hover::after { background: var(--accent); }
+
 .site-header__actions { display: flex; align-items: center; gap: 1rem; }
 
 .nav-toggle {
@@ -280,6 +302,7 @@ p { color: var(--foam-dim); }
 .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-toggle:active span { opacity: .6; }
 
 .mobile-nav {
   position: fixed;
@@ -798,6 +821,7 @@ section { position: relative; }
   line-height: 1.25;
   margin: 0 0 1.75rem;
   padding-left: 1.5rem;
+  text-wrap: balance;
 }
 .captains__lead .eyebrow { padding-left: 1.5rem; }
 .captains__body { padding-left: 1.5rem; max-width: 56ch; font-size: 1.05rem; }
@@ -906,8 +930,12 @@ section { position: relative; }
   opacity: .72;
   max-width: 58ch;
 }
+/* margin-top:auto pins the creed to the card floor so the three cards align
+   on it regardless of how long each bio runs. The gap comes from padding, not
+   margin, so the accent rule stays tight to the text. */
 .crew__creed {
-  margin-top: 1.35rem;
+  margin-top: auto;
+  padding-top: 1.35rem;
   padding-left: 1rem;
   font-family: var(--font-display);
   font-style: italic;
@@ -977,7 +1005,9 @@ section { position: relative; }
   margin-bottom: 1rem;
 }
 .site-footer p, .site-footer address { font-size: .92rem; margin-bottom: .5rem; }
+.site-footer a { transition: color .2s var(--ease); }
 .site-footer a:hover { color: var(--current); }
+.site-footer a:active { color: var(--foam); }
 .site-footer__social { display: flex; flex-direction: column; gap: .6rem; }
 
 .site-footer__bottom {
@@ -993,6 +1023,41 @@ section { position: relative; }
 }
 @media (max-width: 500px) {
   .site-footer__inner { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================================
+   404
+   ========================================================================== */
+
+.notfound {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 6rem var(--edge);
+}
+.notfound h1 {
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  margin-bottom: 1.25rem;
+}
+.notfound__body { font-size: 1.08rem; max-width: 48ch; margin-bottom: 2.5rem; }
+.notfound__actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+.notfound__depth {
+  margin-top: 4rem;
+  font-family: var(--font-mono);
+  font-size: .75rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--foam-dim);
+  opacity: .55;
+}
+
+@media (max-width: 520px) {
+  .notfound__actions { flex-direction: column; }
+  .notfound__actions .btn { width: 100%; }
 }
 
 /* ==========================================================================

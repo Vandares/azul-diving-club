@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://azul-diving-club.vercel.app/sitemap.xml

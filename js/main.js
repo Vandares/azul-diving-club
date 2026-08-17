@@ -11,7 +11,11 @@
      Held until the hero photo is decoded so the type never animates in over
      an empty frame — but never held longer than 1.2s on a slow connection. */
   const startHero = () => {
-    requestAnimationFrame(() => document.documentElement.classList.add('is-loaded'));
+    /* Forced layout read flushes the initial hidden state so the transition
+       still runs. rAF would also work but is throttled in background tabs,
+       which would leave the hero blank until the tab is focused. */
+    void document.body.offsetHeight;
+    document.documentElement.classList.add('is-loaded');
   };
   const heroPhoto = document.querySelector('.hero__photo');
   if (heroPhoto && !heroPhoto.complete) {
@@ -99,6 +103,43 @@
     document.addEventListener('scroll', updateRail, { passive: true });
     window.addEventListener('resize', updateRail);
     updateRail();
+  }
+
+  /* ---------- active nav link ----------
+     The depth rail already reports where you are; the nav did not. This mirrors
+     it so the header shows the current section too. */
+  const navLinks = [...document.querySelectorAll('.main-nav a[href^="#"]')];
+  if (navLinks.length) {
+    const navTargets = navLinks
+      .map(link => ({ link, el: document.querySelector(link.getAttribute('href')) }))
+      .filter(t => t.el);
+
+    let navTicking = false;
+
+    const updateNav = () => {
+      navTicking = false;
+      const probe = window.scrollY + window.innerHeight * 0.35;
+      let current = null;
+      navTargets.forEach(t => {
+        if (t.el.getBoundingClientRect().top + window.scrollY <= probe) current = t;
+      });
+      navTargets.forEach(t => {
+        const on = t === current;
+        t.link.classList.toggle('is-current', on);
+        if (on) t.link.setAttribute('aria-current', 'location');
+        else t.link.removeAttribute('aria-current');
+      });
+    };
+
+    const onScrollNav = () => {
+      if (navTicking) return;
+      navTicking = true;
+      requestAnimationFrame(updateNav);
+    };
+
+    updateNav();
+    document.addEventListener('scroll', onScrollNav, { passive: true });
+    window.addEventListener('resize', updateNav);
   }
 
   /* ---------- depth attenuation ----------
