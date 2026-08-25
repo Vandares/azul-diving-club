@@ -698,6 +698,59 @@ section { position: relative; }
 }
 
 /* ==========================================================================
+   On Site — services list
+   ========================================================================== */
+
+.services {
+  background: var(--ink);
+  padding: 8rem 0;
+}
+.services__inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 var(--edge);
+}
+.services__head { max-width: 660px; margin-bottom: 3.5rem; }
+.services__head h2 { margin-bottom: 1.1rem; }
+.services__lead { max-width: 50ch; font-size: 1.05rem; }
+
+.services__list { border-top: 1px solid rgba(244,241,232,.14); }
+.service {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 1.7fr;
+  gap: 1.5rem 3rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid rgba(244,241,232,.14);
+  align-items: start;
+}
+.service__title { display: flex; flex-direction: column; gap: .5rem; }
+.service h3 {
+  font-size: 1.4rem;
+  line-height: 1.15;
+  color: var(--foam);
+  margin: 0;
+}
+.service__meta {
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--foam-dim);
+  margin: 0;
+}
+.service__meta span { color: var(--current); font-weight: 500; }
+.service__desc { margin: 0; font-size: .98rem; max-width: 58ch; }
+
+@media (max-width: 760px) {
+  .service {
+    grid-template-columns: 1fr;
+    gap: .7rem;
+    padding: 1.85rem 0;
+  }
+  .service h3 { font-size: 1.25rem; }
+}
+
+/* ==========================================================================
    Courses — dive log table
    ========================================================================== */
 

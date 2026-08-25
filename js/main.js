@@ -81,7 +81,7 @@
   if (rail) {
     const fill = rail.querySelector('.depth-rail__fill');
     const marks = [...rail.querySelectorAll('.depth-rail__marks li')];
-    const sections = ['#hero', '#club', '#facilities', '#courses', '#captains', '#ascent']
+    const sections = ['#hero', '#club', '#facilities', '#services', '#courses', '#captains', '#ascent']
       .map(sel => document.querySelector(sel))
       .filter(Boolean);
 
@@ -150,6 +150,7 @@
     { sel: '#hero',       value: 0    },
     { sel: '#club',       value: 0.18 },
     { sel: '#facilities', value: 0.40 },
+    { sel: '#services',   value: 0.53 },
     { sel: '#courses',    value: 0.66 },
     { sel: '#captains',   value: 1    },
     { sel: '#ascent',     value: 0    },
