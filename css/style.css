@@ -1127,3 +1127,142 @@ section { position: relative; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ==========================================================================
+   Language switch
+   ========================================================================== */
+
+.lang-switch {
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  letter-spacing: .08em;
+  color: var(--foam-dim);
+  padding: .5rem .25rem;
+  border-bottom: 1px solid transparent;
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+  white-space: nowrap;
+}
+.lang-switch:hover { color: var(--foam); border-bottom-color: var(--current); }
+.lang-switch:active { color: var(--current); }
+/* The Arabic label is set in Arabic, so it must not be letter-spaced or
+   uppercased — both break the script's joining. */
+.lang-switch[lang="ar"] {
+  font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  letter-spacing: normal;
+  font-size: .86rem;
+}
+.mobile-nav .lang-switch { font-size: 1.1rem; padding: 0; border-bottom: 0; }
+
+@media (max-width: 380px) {
+  .site-header__actions .lang-switch { display: none; }
+}
+
+/* ==========================================================================
+   Arabic typography
+
+   Fraunces and Inter Tight have no Arabic coverage, so the Arabic page runs
+   on IBM Plex Sans Arabic — the Arabic companion to the IBM Plex Mono already
+   in the system, which keeps both languages in one type family rather than
+   two unrelated voices.
+
+   Two rules matter more than the rest:
+   - letter-spacing must be normal. Arabic is cursive; tracking pulls the
+     joins apart and renders the word broken.
+   - font-style must be normal. Arabic has no italic, so an italic request is
+     synthesised as a mechanical slant that reads as a rendering fault.
+   ========================================================================== */
+
+[lang="ar"] {
+  --font-display: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  --font-body: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  /* Latin digits still resolve to Plex Mono; Arabic glyphs fall through to
+     Plex Sans Arabic, so depth readings keep their instrument feel. */
+  --font-mono: 'IBM Plex Mono', 'IBM Plex Sans Arabic', 'Segoe UI', monospace;
+}
+
+[lang="ar"] body,
+[lang="ar"] p { line-height: 1.75; }
+
+[lang="ar"] h1,
+[lang="ar"] h2,
+[lang="ar"] h3 {
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.35;
+}
+/* ch is measured off the "0" glyph, so a measure tuned for English clamps
+   Arabic far too early and strands single words on their own line. */
+[lang="ar"] .hero__headline { line-height: 1.25; max-width: 20ch; }
+[lang="ar"] h2 { max-width: 24ch; }
+
+/* every tracked or slanted run on the page, reset for Arabic */
+[lang="ar"] .eyebrow,
+[lang="ar"] .crew__role,
+[lang="ar"] .crew__rank,
+[lang="ar"] .crew__creds li,
+[lang="ar"] .depth-rail__label,
+[lang="ar"] .depth-rail__num,
+[lang="ar"] .dive-log__row--head,
+[lang="ar"] .dive-log__row span[data-label]::before,
+[lang="ar"] .service__meta,
+[lang="ar"] .site-footer h3,
+[lang="ar"] .site-footer__brand p,
+[lang="ar"] .skip-link,
+[lang="ar"] .club__facts li { letter-spacing: normal; }
+
+[lang="ar"] .hero__headline span,
+[lang="ar"] blockquote p,
+[lang="ar"] .crew__creed { font-style: normal; }
+/* the pull-quote loses italic, so weight carries the emphasis instead */
+[lang="ar"] blockquote p { font-weight: 500; }
+
+/* ==========================================================================
+   RTL layout
+
+   Scoped overrides rather than a rewrite to logical properties: the same
+   result, but it leaves every existing LTR rule untouched.
+   ========================================================================== */
+
+[dir="rtl"] .skip-link { left: auto; right: 1rem; }
+
+/* depth rail moves to the left edge and reads outward from it */
+[dir="rtl"] .depth-rail { right: auto; left: 1.75rem; }
+[dir="rtl"] .depth-rail__marks { right: auto; left: 1.25rem; text-align: left; }
+
+/* the mobile drawer now flies in from the left */
+[dir="rtl"] .mobile-nav { transform: translateX(-100%); }
+[dir="rtl"] .mobile-nav[data-state="open"] { transform: translateX(0); }
+
+/* hero scrim darkens the side the type actually sits on */
+[dir="rtl"] .hero__scrim {
+  background:
+    linear-gradient(to top,
+      var(--ink) 1%,
+      rgba(7,24,38,.60) 20%,
+      rgba(7,24,38,.20) 48%,
+      rgba(7,24,38,.34) 74%,
+      rgba(7,24,38,.88) 100%),
+    linear-gradient(to left,
+      rgba(7,24,38,.50) 0%,
+      rgba(7,24,38,.12) 40%,
+      rgba(7,24,38,0) 64%);
+}
+
+[dir="rtl"] .club__facts li { padding-left: 0; padding-right: 1.1rem; }
+[dir="rtl"] .club__facts li::before { left: auto; right: 0; }
+
+[dir="rtl"] .captains__inner { border-left: 0; border-right: 2px solid var(--current); }
+[dir="rtl"] .captains__lead .eyebrow,
+[dir="rtl"] .captains__body,
+[dir="rtl"] .captains__lead blockquote p { padding-left: 0; padding-right: 1.5rem; }
+
+[dir="rtl"] .crew__creed {
+  padding-left: 0;
+  padding-right: 1rem;
+  border-left: 0;
+  border-right: 1px solid var(--accent);
+}
+
+/* the dive-log depth marker sets against the row from the trailing edge */
+[dir="rtl"] .dive-log__row:not(.dive-log__row--head)::before { left: auto; right: -12px; }
+[dir="rtl"] .dive-log__row:not(.dive-log__row--head):hover > span { transform: translateX(-10px); }
