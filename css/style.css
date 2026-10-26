@@ -183,7 +183,9 @@ p { color: var(--foam-dim); text-wrap: pretty; }
   height: 46vh;
   max-height: 420px;
   pointer-events: none;
+  transition: opacity .35s var(--ease), visibility .35s;
 }
+.depth-rail.is-hidden { opacity: 0; visibility: hidden; }
 .depth-rail__track {
   position: relative;
   width: 2px;
@@ -321,6 +323,10 @@ p { color: var(--foam-dim); text-wrap: pretty; }
 @media (max-width: 860px) {
   .main-nav { display: none; }
   .nav-toggle { display: flex; }
+}
+/* six links: tighten the spacing before the nav collapses into the menu */
+@media (max-width: 1180px) {
+  .main-nav { gap: 1.5rem; }
   .site-header__inner { height: 72px; }
 }
 
@@ -380,7 +386,7 @@ p { color: var(--foam-dim); text-wrap: pretty; }
 .hero__headline span { color: var(--foam-dim); font-style: italic; }
 .hero__sub {
   margin-top: 1.75rem;
-  max-width: 46ch;
+  max-width: 54ch;
   font-size: 1.08rem;
   color: rgba(244,241,232,.82);
 }
@@ -548,11 +554,14 @@ section { position: relative; }
 .benefits__head h2 { margin-bottom: 1.1rem; }
 .benefits__head p { max-width: 46ch; font-size: 1.05rem; }
 
+/* Seven features: four across, with the last card spanning two so both rows
+   close flush instead of leaving a hole. */
 .benefits__grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.25rem;
 }
+.benefit--wide { grid-column: span 2; }
 .benefit {
   background: var(--ink);
   border: 1px solid rgba(244,241,232,.08);
@@ -681,6 +690,24 @@ section { position: relative; }
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-2.5px); }
 }
+/* 7 — the lens focuses, the flash fires */
+.i-lens { transform-box: fill-box; transform-origin: center; }
+.benefit:hover .i-lens { animation: icon-focus 1.1s var(--ease-rise); }
+@keyframes icon-focus {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(.78); }
+  100% { transform: scale(1); }
+}
+.i-flash circle { fill: currentColor; stroke: none; }
+.i-flash path { stroke: var(--foam); }
+.i-flash { opacity: 0; }
+.benefit:hover .i-flash { animation: icon-flash 1.1s var(--ease); }
+@keyframes icon-flash {
+  0%, 30% { opacity: 0; }
+  40%     { opacity: 1; }
+  100%    { opacity: 0; }
+}
+
 .benefit h3 {
   font-family: var(--font-body);
   font-size: .96rem;
@@ -691,10 +718,165 @@ section { position: relative; }
 }
 
 @media (max-width: 1024px) {
-  .benefits__grid { grid-template-columns: repeat(3, 1fr); }
+  .benefits__grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 640px) {
-  .benefits__grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .benefits__grid { gap: 1rem; }
+}
+
+/* ==========================================================================
+   Facilities — horizontal slider of photo cards
+   ========================================================================== */
+
+.facilities {
+  /* left inset that lines the first card up with the 1360px content column,
+     while the track itself still bleeds to the right edge of the viewport */
+  --gutter: max(var(--edge), calc((100% - 1360px) / 2 + var(--edge)));
+  background: var(--ink);
+  padding: 8rem 0 3rem;
+}
+.facilities__head {
+  max-width: 1360px;
+  margin: 0 auto 3rem;
+  padding: 0 var(--edge);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.facilities__intro h2 { max-width: 22ch; margin-bottom: 1.25rem; }
+.facilities__intro p { max-width: 56ch; font-size: 1.05rem; }
+
+.slider-nav { display: flex; gap: .75rem; flex-shrink: 0; }
+.slider-btn {
+  width: 52px; height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(244,241,232,.22);
+  border-radius: 50%;
+  color: var(--foam);
+  transition: border-color .3s var(--ease), background .3s var(--ease),
+              opacity .3s var(--ease), transform .2s var(--ease);
+}
+.slider-btn svg {
+  width: 20px; height: 20px;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.slider-btn:hover:not(:disabled) { border-color: var(--current); background: rgba(79,199,214,.1); }
+.slider-btn:active:not(:disabled) { transform: scale(.94); }
+.slider-btn:disabled { opacity: .3; cursor: default; }
+
+.facility-track {
+  list-style: none;
+  margin: 0;
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  padding: .5rem var(--gutter) 1.5rem;
+  scrollbar-width: none;
+}
+.facility-track::-webkit-scrollbar { display: none; }
+.facility-track:focus-visible { outline-offset: -2px; }
+
+.facility {
+  flex: 0 0 clamp(280px, 30vw, 410px);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--azul-deep);
+  border: 1px solid rgba(244,241,232,.08);
+  border-radius: 16px;
+  transition: transform .5s var(--ease-settle), border-color .5s var(--ease),
+              box-shadow .5s var(--ease-settle);
+}
+.facility:hover {
+  transform: translateY(-6px);
+  border-color: rgba(79,199,214,.4);
+  box-shadow: 0 20px 44px -22px rgba(3,12,20,.9);
+  transition-timing-function: var(--ease-rise);
+}
+
+.facility__media {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  /* placeholder water tone, replaced by the photo once one is added */
+  background:
+    radial-gradient(120% 90% at 30% 0%, rgba(79,199,214,.28), transparent 60%),
+    linear-gradient(170deg, var(--azul-mid) 0%, var(--azul-deep) 70%, var(--ink) 100%);
+}
+.facility:nth-child(even) .facility__media {
+  background:
+    radial-gradient(120% 90% at 75% 0%, rgba(79,199,214,.24), transparent 60%),
+    linear-gradient(190deg, var(--azul-mid-soft) 0%, var(--azul-deep) 70%, var(--ink) 100%);
+}
+.facility__media img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 70%;
+  transition: transform .9s var(--ease-settle);
+}
+/* soft shade along the bottom so the number reads on bright photos */
+.facility__media::after {
+  content: '';
+  position: absolute;
+  inset: 55% 0 0 0;
+  background: linear-gradient(to top, rgba(7,24,38,.55), rgba(7,24,38,0));
+  pointer-events: none;
+}
+.facility:hover .facility__media img { transform: scale(1.05); transition-timing-function: var(--ease-rise); }
+.facility__num {
+  position: absolute;
+  left: 1.25rem; bottom: 1rem;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  letter-spacing: .1em;
+  color: var(--foam);
+  text-shadow: 0 1px 8px rgba(7,24,38,.6);
+}
+
+.facility__text { padding: 1.5rem 1.5rem 1.75rem; }
+.facility h3 { font-size: clamp(1.2rem, 1.6vw, 1.4rem); }
+.facility__tag {
+  margin-top: .45rem;
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.facility__body { margin-top: .8rem; font-size: .95rem; }
+
+.facility-progress {
+  width: calc(100% - 2 * var(--edge));
+  max-width: calc(1360px - 2 * var(--edge));
+  margin: 1rem auto 0;
+  height: 2px;
+  background: rgba(244,241,232,.12);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.facility-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--current);
+  border-radius: 2px;
+}
+
+@media (max-width: 860px) {
+  .facilities { padding-top: 6rem; }
+  .facilities__head { flex-direction: column; align-items: flex-start; }
+  .slider-nav { display: none; }
+  .facility { flex-basis: 82%; }
 }
 
 /* ==========================================================================

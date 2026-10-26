@@ -81,7 +81,11 @@
   if (rail) {
     const fill = rail.querySelector('.depth-rail__fill');
     const marks = [...rail.querySelectorAll('.depth-rail__marks li')];
-    const sections = ['#hero', '#club', '#facilities', '#services', '#courses', '#captains', '#ascent']
+    const slider = document.getElementById('facilityTrack');
+    /* English and Arabic pages share this list; each page only has the ids it
+       uses (#features + #facilities here, #facilities + #services on /ar/), and
+       missing ones drop out, so the marks still line up one-to-one. */
+    const sections = ['#hero', '#club', '#features', '#facilities', '#services', '#courses', '#captains', '#ascent']
       .map(sel => document.querySelector(sel))
       .filter(Boolean);
 
@@ -98,6 +102,14 @@
         if (sec.offsetTop <= probe) activeIndex = i;
       });
       marks.forEach((m, i) => m.classList.toggle('is-active', i === activeIndex));
+
+      /* The facilities slider runs to the right edge of the screen, straight
+         under the rail — step the rail aside while the cards pass beneath it. */
+      if (slider) {
+        const r = rail.getBoundingClientRect();
+        const s = slider.getBoundingClientRect();
+        rail.classList.toggle('is-hidden', s.top < r.bottom && s.bottom > r.top);
+      }
     };
 
     document.addEventListener('scroll', updateRail, { passive: true });
@@ -149,9 +161,11 @@
   const depthStops = [
     { sel: '#hero',       value: 0    },
     { sel: '#club',       value: 0.18 },
-    { sel: '#facilities', value: 0.40 },
-    { sel: '#services',   value: 0.53 },
-    { sel: '#courses',    value: 0.66 },
+    { sel: '#features',   value: 0.36 },
+    /* #facilities is the slider here but the benefits grid on /ar/ */
+    { sel: '#facilities', value: document.getElementById('features') ? 0.52 : 0.36 },
+    { sel: '#services',   value: 0.52 },
+    { sel: '#courses',    value: 0.70 },
     { sel: '#captains',   value: 1    },
     { sel: '#ascent',     value: 0    },
   ]
@@ -210,6 +224,66 @@
     document.addEventListener('scroll', onScrollDepth, { passive: true });
     window.addEventListener('resize', () => { measure(); updateDepth(); });
     window.addEventListener('load', () => { measure(); updateDepth(); });
+  }
+
+  /* ---------- facilities slider ----------
+     Native horizontal scroll with snap does the swiping; the arrows step one
+     card at a time and the progress rule tracks how far along the row you are. */
+  const track = document.getElementById('facilityTrack');
+  if (track) {
+    const progress = document.getElementById('facilityProgress');
+    const buttons = [...document.querySelectorAll('.slider-btn[aria-controls="facilityTrack"]')];
+
+    const step = () => {
+      const card = track.querySelector('.facility');
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      return card ? card.getBoundingClientRect().width + gap : track.clientWidth;
+    };
+
+    let sliderTicking = false;
+    const updateSlider = () => {
+      sliderTicking = false;
+      const max = track.scrollWidth - track.clientWidth;
+      const pos = Math.max(0, track.scrollLeft);
+      /* the bar shows the visible share of the row, sliding to the end */
+      const visible = max > 0 ? track.clientWidth / track.scrollWidth : 1;
+      if (progress) {
+        progress.style.width = (visible * 100).toFixed(2) + '%';
+        progress.style.transform = `translateX(${max > 0 ? (pos / max) * ((1 - visible) / visible) * 100 : 0}%)`;
+      }
+      buttons.forEach(btn => {
+        const dir = Number(btn.dataset.dir);
+        btn.disabled = dir < 0 ? pos <= 2 : pos >= max - 2;
+      });
+    };
+
+    buttons.forEach(btn => btn.addEventListener('click', () => {
+      track.scrollBy({ left: Number(btn.dataset.dir) * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+    }));
+    /* Mouse wheel over the cards steps the row one card per notch. Sideways
+       trackpad swipes already scroll natively, so only a mostly-vertical wheel
+       is taken over — and only while the row can still move that way, so at
+       either end the page carries on scrolling instead of trapping the visitor. */
+    let wheelLock = 0;
+    track.addEventListener('wheel', e => {
+      if (e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;
+      const dir = Math.sign(e.deltaY);
+      const max = track.scrollWidth - track.clientWidth;
+      const now = performance.now();
+      if (now < wheelLock) { e.preventDefault(); return; }
+      if (dir < 0 ? track.scrollLeft <= 2 : track.scrollLeft >= max - 2) return;
+      e.preventDefault();
+      wheelLock = now + 450;
+      track.scrollBy({ left: dir * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+    }, { passive: false });
+
+    track.addEventListener('scroll', () => {
+      if (sliderTicking) return;
+      sliderTicking = true;
+      requestAnimationFrame(updateSlider);
+    }, { passive: true });
+    window.addEventListener('resize', updateSlider);
+    updateSlider();
   }
 
   /* ---------- caustics + bubbles canvas ---------- */
