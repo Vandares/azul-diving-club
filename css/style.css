@@ -1448,3 +1448,8 @@ section { position: relative; }
 /* the dive-log depth marker sets against the row from the trailing edge */
 [dir="rtl"] .dive-log__row:not(.dive-log__row--head)::before { left: auto; right: -12px; }
 [dir="rtl"] .dive-log__row:not(.dive-log__row--head):hover > span { transform: translateX(-10px); }
+
+/* facilities slider: arrows point the way the row moves, the number sits on
+   the leading corner, and the progress thumb starts from the right */
+[dir="rtl"] .slider-btn svg { transform: scaleX(-1); }
+[dir="rtl"] .facility__num { left: auto; right: 1.25rem; }

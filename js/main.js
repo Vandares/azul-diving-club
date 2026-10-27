@@ -233,6 +233,11 @@
   if (track) {
     const progress = document.getElementById('facilityProgress');
     const buttons = [...document.querySelectorAll('.slider-btn[aria-controls="facilityTrack"]')];
+    /* On the Arabic page the row starts at the right and moves left: scrollLeft
+       runs from 0 down to -max there, so positions are read as a distance from
+       the start and every movement is mirrored. */
+    const flow = getComputedStyle(track).direction === 'rtl' ? -1 : 1;
+    const travelled = () => Math.abs(track.scrollLeft);
 
     const step = () => {
       const card = track.querySelector('.facility');
@@ -244,12 +249,12 @@
     const updateSlider = () => {
       sliderTicking = false;
       const max = track.scrollWidth - track.clientWidth;
-      const pos = Math.max(0, track.scrollLeft);
+      const pos = travelled();
       /* the bar shows the visible share of the row, sliding to the end */
       const visible = max > 0 ? track.clientWidth / track.scrollWidth : 1;
       if (progress) {
         progress.style.width = (visible * 100).toFixed(2) + '%';
-        progress.style.transform = `translateX(${max > 0 ? (pos / max) * ((1 - visible) / visible) * 100 : 0}%)`;
+        progress.style.transform = `translateX(${flow * (max > 0 ? (pos / max) * ((1 - visible) / visible) * 100 : 0)}%)`;
       }
       buttons.forEach(btn => {
         const dir = Number(btn.dataset.dir);
@@ -258,7 +263,7 @@
     };
 
     buttons.forEach(btn => btn.addEventListener('click', () => {
-      track.scrollBy({ left: Number(btn.dataset.dir) * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+      track.scrollBy({ left: flow * Number(btn.dataset.dir) * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
     }));
     /* Mouse wheel over the cards steps the row one card per notch. Sideways
        trackpad swipes already scroll natively, so only a mostly-vertical wheel
@@ -271,10 +276,10 @@
       const max = track.scrollWidth - track.clientWidth;
       const now = performance.now();
       if (now < wheelLock) { e.preventDefault(); return; }
-      if (dir < 0 ? track.scrollLeft <= 2 : track.scrollLeft >= max - 2) return;
+      if (dir < 0 ? travelled() <= 2 : travelled() >= max - 2) return;
       e.preventDefault();
       wheelLock = now + 450;
-      track.scrollBy({ left: dir * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+      track.scrollBy({ left: flow * dir * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
     }, { passive: false });
 
     track.addEventListener('scroll', () => {
