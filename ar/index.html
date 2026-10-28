@@ -59,10 +59,9 @@
     <li data-depth="1"><span class="depth-rail__num">3م</span><span class="depth-rail__label">النادي</span></li>
     <li data-depth="2"><span class="depth-rail__num">8م</span><span class="depth-rail__label">المميزات</span></li>
     <li data-depth="3"><span class="depth-rail__num">12م</span><span class="depth-rail__label">المرافق</span></li>
-    <li data-depth="4"><span class="depth-rail__num">15م</span><span class="depth-rail__label">المقاطع</span></li>
-    <li data-depth="5"><span class="depth-rail__num">18م</span><span class="depth-rail__label">الدورات</span></li>
-    <li data-depth="6"><span class="depth-rail__num">30م</span><span class="depth-rail__label">الكباتنة</span></li>
-    <li data-depth="7"><span class="depth-rail__num">40م</span><span class="depth-rail__label">النزول</span></li>
+    <li data-depth="4"><span class="depth-rail__num">18م</span><span class="depth-rail__label">الدورات</span></li>
+    <li data-depth="5"><span class="depth-rail__num">30م</span><span class="depth-rail__label">الكباتنة</span></li>
+    <li data-depth="6"><span class="depth-rail__num">40م</span><span class="depth-rail__label">النزول</span></li>
   </ol>
 </aside>
 
@@ -143,6 +142,41 @@
         <a class="btn btn--coral btn--lg" href="https://wa.me/966508700078" target="_blank" rel="noopener">احجز غطسة تجريبية</a>
         <a class="btn btn--ghost btn--lg" href="#courses">تصفّح الدورات</a>
       </div>
+    </div>
+
+    <div class="hero__reels">
+      <ol class="reel-deck" id="reelDeck" tabindex="0" aria-roledescription="carousel" aria-label="مقاطع أزول">
+        <li class="reel" style="--pos: 0" aria-roledescription="slide" aria-label="1 / 4: تعرّف على الكباتن">
+          <video class="reel__video" src="/assets/reel-1.mp4" poster="/assets/reel-1.jpg" muted playsinline preload="none"></video>
+          <span class="reel__meta" aria-hidden="true"><span class="reel__num">01</span><span class="reel__hint">اضغط للصوت</span><span class="reel__time">0:21</span></span>
+          <span class="reel__caption"><span class="reel__title">تعرّف على الكباتن</span><span class="reel__tag">الطاقم خلف كل غطسة</span></span>
+          <span class="reel__bar" aria-hidden="true"><span></span></span>
+        </li>
+        <li class="reel" style="--pos: 1" aria-roledescription="slide" aria-label="2 / 4: الغوص الحر في أزول">
+          <video class="reel__video" src="/assets/reel-2.mp4" poster="/assets/reel-2.jpg" muted playsinline preload="none"></video>
+          <span class="reel__meta" aria-hidden="true"><span class="reel__num">02</span><span class="reel__hint">اضغط للصوت</span><span class="reel__time">0:48</span></span>
+          <span class="reel__caption"><span class="reel__title">الغوص الحر في أزول</span><span class="reel__tag">نَفَسٌ واحد، وأزرق مفتوح</span></span>
+          <span class="reel__bar" aria-hidden="true"><span></span></span>
+        </li>
+        <li class="reel" style="--pos: 2" aria-roledescription="slide" aria-label="3 / 4: قبل النزول">
+          <video class="reel__video" src="/assets/reel-3.mp4" poster="/assets/reel-3.jpg" muted playsinline preload="none"></video>
+          <span class="reel__meta" aria-hidden="true"><span class="reel__num">03</span><span class="reel__hint">اضغط للصوت</span><span class="reel__time">0:17</span></span>
+          <span class="reel__caption"><span class="reel__title">قبل النزول</span><span class="reel__tag">فحص السلامة مع الكابتن</span></span>
+          <span class="reel__bar" aria-hidden="true"><span></span></span>
+        </li>
+        <li class="reel" style="--pos: 3" aria-roledescription="slide" aria-label="4 / 4: يوم في الماء">
+          <video class="reel__video" src="/assets/reel-4.mp4" poster="/assets/reel-4.jpg" muted playsinline preload="none"></video>
+          <span class="reel__meta" aria-hidden="true"><span class="reel__num">04</span><span class="reel__hint">اضغط للصوت</span><span class="reel__time">0:12</span></span>
+          <span class="reel__caption"><span class="reel__title">يوم في الماء</span><span class="reel__tag">المتحف والشعاب وأول قفزة</span></span>
+          <span class="reel__bar" aria-hidden="true"><span></span></span>
+        </li>
+      </ol>
+        <div class="reels__controls">
+          <p class="reels__count" aria-hidden="true"><b id="reelCount">01</b> / 04</p>
+          <button class="slider-btn" type="button" data-reel-step="-1" aria-controls="reelDeck" aria-label="المقطع السابق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <button class="slider-btn" type="button" data-reel-step="1" aria-controls="reelDeck" aria-label="المقطع التالي"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+          <button class="slider-btn reels__sound" type="button" data-reel-sound aria-pressed="false" aria-label="الصوت"><svg class="i-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/><path d="M15.5 9.5a3.5 3.5 0 010 5M18 7a7 7 0 010 10"/></svg><svg class="i-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/><path d="M16 10l4 4M20 10l-4 4"/></svg></button>
+        </div>
     </div>
 
     <a class="scroll-cue" href="#club" aria-label="انتقل إلى القسم التالي">
@@ -346,49 +380,6 @@
   </section>
 
   <!-- المقاطع -->
-  <section class="reels" id="reels">
-    <div class="reels__inner">
-      <div class="reels__intro">
-        <p class="eyebrow reveal">15م — بعدسة أزول</p>
-        <h2 class="reveal">الحياة في أزول، مباشرة من الماء.</h2>
-        <p class="reveal">تعرّف على الطاقم، وتعلّم فحوصات السلامة، وشاهد كيف يبدو يومٌ تحت السطح. اضغط على المقطع للصوت، ثم اسحبه أو استخدم الأسهم للانتقال إلى التالي.</p>
-        <div class="reels__controls reveal">
-          <p class="reels__count" aria-hidden="true"><b id="reelCount">01</b> / 04</p>
-          <button class="slider-btn" type="button" data-reel-step="-1" aria-controls="reelDeck" aria-label="المقطع السابق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-          <button class="slider-btn" type="button" data-reel-step="1" aria-controls="reelDeck" aria-label="المقطع التالي"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
-          <button class="slider-btn reels__sound" type="button" data-reel-sound aria-pressed="false" aria-label="الصوت"><svg class="i-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/><path d="M15.5 9.5a3.5 3.5 0 010 5M18 7a7 7 0 010 10"/></svg><svg class="i-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/><path d="M16 10l4 4M20 10l-4 4"/></svg></button>
-        </div>
-      </div>
-
-      <ol class="reel-deck" id="reelDeck" tabindex="0" aria-roledescription="carousel" aria-label="مقاطع أزول">
-        <li class="reel" style="--pos: 0" aria-roledescription="slide" aria-label="1 / 4: تعرّف على الكباتن">
-          <video class="reel__video" src="/assets/reel-1.mp4" poster="/assets/reel-1.jpg" muted playsinline preload="none"></video>
-          <span class="reel__meta" aria-hidden="true"><span class="reel__num">01</span><span class="reel__hint">اضغط للصوت</span><span class="reel__time">0:21</span></span>
-          <span class="reel__caption"><span class="reel__title">تعرّف على الكباتن</span><span class="reel__tag">الطاقم خلف كل غطسة</span></span>
-          <span class="reel__bar" aria-hidden="true"><span></span></span>
-        </li>
-        <li class="reel" style="--pos: 1" aria-roledescription="slide" aria-label="2 / 4: الغوص الحر في أزول">
-          <video class="reel__video" src="/assets/reel-2.mp4" poster="/assets/reel-2.jpg" muted playsinline preload="none"></video>
-          <span class="reel__meta" aria-hidden="true"><span class="reel__num">02</span><span class="reel__hint">اضغط للصوت</span><span class="reel__time">0:48</span></span>
-          <span class="reel__caption"><span class="reel__title">الغوص الحر في أزول</span><span class="reel__tag">نَفَسٌ واحد، وأزرق مفتوح</span></span>
-          <span class="reel__bar" aria-hidden="true"><span></span></span>
-        </li>
-        <li class="reel" style="--pos: 2" aria-roledescription="slide" aria-label="3 / 4: قبل النزول">
-          <video class="reel__video" src="/assets/reel-3.mp4" poster="/assets/reel-3.jpg" muted playsinline preload="none"></video>
-          <span class="reel__meta" aria-hidden="true"><span class="reel__num">03</span><span class="reel__hint">اضغط للصوت</span><span class="reel__time">0:17</span></span>
-          <span class="reel__caption"><span class="reel__title">قبل النزول</span><span class="reel__tag">فحص السلامة مع الكابتن</span></span>
-          <span class="reel__bar" aria-hidden="true"><span></span></span>
-        </li>
-        <li class="reel" style="--pos: 3" aria-roledescription="slide" aria-label="4 / 4: يوم في الماء">
-          <video class="reel__video" src="/assets/reel-4.mp4" poster="/assets/reel-4.jpg" muted playsinline preload="none"></video>
-          <span class="reel__meta" aria-hidden="true"><span class="reel__num">04</span><span class="reel__hint">اضغط للصوت</span><span class="reel__time">0:12</span></span>
-          <span class="reel__caption"><span class="reel__title">يوم في الماء</span><span class="reel__tag">المتحف والشعاب وأول قفزة</span></span>
-          <span class="reel__bar" aria-hidden="true"><span></span></span>
-        </li>
-      </ol>
-    </div>
-  </section>
-
   <!-- الدورات -->
   <section class="courses" id="courses">
     <div class="section-head">

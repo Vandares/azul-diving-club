@@ -81,12 +81,13 @@
   if (rail) {
     const fill = rail.querySelector('.depth-rail__fill');
     const marks = [...rail.querySelectorAll('.depth-rail__marks li')];
+    const railMarks = rail.querySelector('.depth-rail__marks');
     /* rows that run under the rail: the facilities slider and the reels */
     const passers = ['facilityTrack', 'reelDeck'].map(id => document.getElementById(id)).filter(Boolean);
     /* English and Arabic pages share this list; each page only has the ids it
        uses (#features + #facilities here, #facilities + #services on /ar/), and
        missing ones drop out, so the marks still line up one-to-one. */
-    const sections = ['#hero', '#club', '#features', '#facilities', '#services', '#reels', '#courses', '#captains', '#ascent']
+    const sections = ['#hero', '#club', '#features', '#facilities', '#services', '#courses', '#captains', '#ascent']
       .map(sel => document.querySelector(sel))
       .filter(Boolean);
 
@@ -104,13 +105,19 @@
       });
       marks.forEach((m, i) => m.classList.toggle('is-active', i === activeIndex));
 
-      /* The facilities slider and the reels run under the rail at the right
-         edge — step the rail aside while either row passes beneath it. */
+      /* The facilities slider runs under the rail at the right edge, and the
+         hero reels sit close to it — step the rail aside while either passes
+         beneath it. */
       if (passers.length) {
-        const r = rail.getBoundingClientRect();
+        /* the labels hang outside the rail's own box, so measure them */
+        const r = railMarks.getBoundingClientRect();
         rail.classList.toggle('is-hidden', passers.some(el => {
-          const s = el.getBoundingClientRect();
-          return s.top < r.bottom && s.bottom > r.top;
+          /* the deck's back cards fan out past its box */
+          const boxes = el.id === 'reelDeck' ? [...el.children] : [el];
+          return boxes.some(box => {
+            const s = box.getBoundingClientRect();
+            return s.top < r.bottom && s.bottom > r.top && s.left < r.right && s.right > r.left;
+          });
         }));
       }
     };
@@ -168,7 +175,6 @@
     /* #facilities is the slider here but the benefits grid on /ar/ */
     { sel: '#facilities', value: document.getElementById('features') ? 0.52 : 0.36 },
     { sel: '#services',   value: 0.52 },
-    { sel: '#reels',      value: 0.61 },
     { sel: '#courses',    value: 0.70 },
     { sel: '#captains',   value: 1    },
     { sel: '#ascent',     value: 0    },
@@ -343,7 +349,7 @@
      (browsers only autoplay muted) and a tap on the card turns it on. */
   const deck = document.getElementById('reelDeck');
   if (deck) {
-    const reelSection = deck.closest('.reels');
+    const reelSection = deck.closest('.hero__reels');
     const cards = [...deck.querySelectorAll('.reel')];
     const videos = cards.map(card => card.querySelector('video'));
     const side = getComputedStyle(deck).direction === 'rtl' ? -1 : 1;
@@ -490,7 +496,11 @@
       inView = entry.isIntersecting;
       if (inView && !reelSection.classList.contains('is-in')) {
         reelSection.classList.add('is-in');
-        setTimeout(() => reelSection.classList.add('is-settled'), 1400);
+        setTimeout(() => {
+          reelSection.classList.add('is-settled');
+          /* the fan is open now; let the depth rail step aside if it meets it */
+          document.dispatchEvent(new Event('scroll'));
+        }, 2200);
       }
       sync();
     }, { threshold: 0.35 }).observe(deck);

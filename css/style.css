@@ -937,49 +937,44 @@ section { position: relative; }
 }
 
 /* ==========================================================================
-   Reels — a deck of vertical video cards
+   Reels — a deck of vertical video cards in the hero
 
-   One reel plays at the front; the rest wait fanned out behind it. Flipping
-   (swipe, drag or the arrows) throws the front card off to the side and lets
-   it settle at the back of the deck. --pos is each card's place in the deck
-   (0 is the front) and is set from main.js.
+   On wide screens the deck stands in the open water on the opposite side
+   from the headline; below 1025px it drops under the hero text. One reel
+   plays at the front; the rest wait fanned out behind it. Flipping (swipe,
+   drag or the arrows) throws the front card off to the side and lets it
+   settle at the back. --pos is each card's place in the deck (0 is the
+   front) and is set from main.js.
    ========================================================================== */
 
-.reels {
-  background:
-    radial-gradient(50% 55% at 72% 50%, rgba(79,199,214,.13), transparent 70%),
-    linear-gradient(180deg, var(--ink) 0%, var(--azul-deep) 50%, var(--ink) 100%);
-  padding: 8rem 0 9rem;
-  overflow: hidden;
-}
-.reels__inner {
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: 0 var(--edge);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: clamp(2.5rem, 6vw, 6rem);
+.hero__reels {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  /* line the deck's fanned edge up with the content column, clear of the rail */
+  inset-inline-end: max(calc(var(--edge) + 11rem), calc((100% - 1360px) / 2 + var(--edge) + 11rem));
+  translate: 0 -46%;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 1.75rem;
 }
-.reels__intro h2 { max-width: 16ch; margin-bottom: 1.25rem; }
-.reels__intro p { max-width: 44ch; font-size: 1.05rem; }
 
 .reels__controls {
   display: flex;
   align-items: center;
   gap: .75rem;
-  margin-top: 2.5rem;
 }
 .reels__count {
   font-family: var(--font-mono);
   font-size: .8rem;
   letter-spacing: .12em;
   color: var(--foam-dim);
-  margin-inline-end: .75rem;
+  margin-inline-end: .5rem;
   min-width: 5.5ch;
 }
 .reels__count b { color: var(--foam); font-weight: 500; }
-/* the counter reads 01 / 04 in both languages, and the speaker is not an arrow */
+/* the counter reads 01 / 04 in both languages */
 [dir="rtl"] .reels__count { direction: ltr; unicode-bidi: isolate; }
 .reels__sound .i-on { display: none; }
 .reels__sound[aria-pressed="true"] .i-on { display: block; }
@@ -994,17 +989,15 @@ section { position: relative; }
   list-style: none;
   margin: 0;
   padding: 0;
-  width: clamp(250px, 24vw, 330px);
+  /* sized off the viewport height too, so the deck fits under the header */
+  width: min(23vw, 320px, calc((100svh - 300px) * 9 / 16));
   aspect-ratio: 9 / 16;
-  justify-self: center;
-  /* leave room on the fanned side so the deck as a whole looks centred */
-  translate: -9% 0;
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
   outline: none;
 }
-[dir="rtl"] .reel-deck { --side: -1; translate: 9% 0; }
+[dir="rtl"] .reel-deck { --side: -1; }
 .reel-deck:focus-visible .reel.is-front { outline: 2px solid var(--current); outline-offset: 4px; }
 
 .reel {
@@ -1014,12 +1007,12 @@ section { position: relative; }
   overflow: hidden;
   border-radius: 20px;
   background: var(--azul-deep);
-  border: 1px solid rgba(244,241,232,.12);
-  box-shadow: 0 34px 60px -30px rgba(3,12,20,.95);
+  border: 1px solid rgba(244,241,232,.14);
+  box-shadow: 0 34px 70px -28px rgba(3,12,20,.95);
   transform-origin: 50% 110%;
   transform:
-    translateX(calc(var(--side) * var(--pos) * 11%))
-    rotate(calc(var(--side) * var(--pos) * 4deg))
+    translateX(calc(var(--side) * var(--pos) * 8%))
+    rotate(calc(var(--side) * var(--pos) * 3deg))
     scale(calc(1 - var(--pos) * .07));
   z-index: calc(10 - var(--pos));
   filter: brightness(calc(1 - var(--pos) * .2)) saturate(calc(1 - var(--pos) * .18));
@@ -1028,9 +1021,12 @@ section { position: relative; }
 .reel.is-front { cursor: grab; }
 .reel.is-dragging { cursor: grabbing; transition: none; }
 
-/* entrance: the deck rises out of the dark, back cards first, then fans out */
-.reels:not(.is-in) .reel { opacity: 0; translate: 0 120px; transform: none; }
-.reels.is-in:not(.is-settled) .reel { transition-delay: calc((3 - var(--pos)) * 110ms); }
+/* entrance: after the headline lands, the deck rises out of the water, back
+   cards first, then fans out */
+.hero__reels:not(.is-in) .reel { opacity: 0; translate: 0 120px; transform: none; }
+.hero__reels.is-in:not(.is-settled) .reel { transition-delay: calc(.6s + (3 - var(--pos)) * 110ms); }
+.js .hero__reels .reels__controls { opacity: 0; transition: opacity .8s var(--ease) 1.3s; }
+.js .hero__reels.is-in .reels__controls { opacity: 1; }
 
 .reel__video {
   position: absolute;
@@ -1093,7 +1089,7 @@ section { position: relative; }
 }
 .reel__title {
   font-family: var(--font-display);
-  font-size: clamp(1.2rem, 1.6vw, 1.5rem);
+  font-size: clamp(1.15rem, 1.5vw, 1.45rem);
   font-weight: 500;
   line-height: 1.15;
   color: var(--foam);
@@ -1120,25 +1116,41 @@ section { position: relative; }
 }
 [dir="rtl"] .reel__bar span { transform-origin: right; }
 
-@media (max-width: 860px) {
-  .reels { padding: 6rem 0 7rem; }
-  .reels__inner { grid-template-columns: 1fr; gap: 3rem; }
-  .reel-deck { width: min(64vw, 300px); }
-  /* controls sit under the deck, where the thumb is */
-  .reels__controls { margin-top: 0; justify-content: center; }
-  .reels__intro { display: contents; }
-  .reels__intro > .reels__controls { order: 2; }
+/* the headline column narrows so it never runs under the deck */
+@media (min-width: 1025px) {
+  .hero__content > * { max-width: min(54ch, calc(100% - 14rem - min(23vw, 320px))); }
+  .hero__headline { max-width: min(14ch, calc(100% - 14rem - min(23vw, 320px))); }
+}
+
+/* below 1025px the hero stacks: text first, then the deck */
+@media (max-width: 1024px) {
+  .hero { flex-direction: column; align-items: stretch; justify-content: flex-end; }
+  .hero__content { padding-bottom: 3rem; }
+  .hero__reels {
+    position: relative;
+    top: auto;
+    inset-inline-end: auto;
+    translate: none;
+    padding-bottom: 7rem;
+  }
+  .reel-deck {
+    width: min(62vw, 300px);
+    /* nudge away from the fan so the deck as a whole looks centred */
+    translate: calc(var(--side) * -7%) 0;
+  }
+  .scroll-cue { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .reel,
-  .reels:not(.is-in) .reel { transition: none; opacity: 1; translate: none; }
-  .reels:not(.is-in) .reel {
+  .hero__reels:not(.is-in) .reel { transition: none; opacity: 1; translate: none; }
+  .hero__reels:not(.is-in) .reel {
     transform:
-      translateX(calc(var(--side) * var(--pos) * 11%))
-      rotate(calc(var(--side) * var(--pos) * 4deg))
+      translateX(calc(var(--side) * var(--pos) * 8%))
+      rotate(calc(var(--side) * var(--pos) * 3deg))
       scale(calc(1 - var(--pos) * .07));
   }
+  .js .hero__reels .reels__controls { opacity: 1; transition: none; }
   .reel-deck.is-muted .reel.is-front .reel__hint { animation: none; }
 }
 
