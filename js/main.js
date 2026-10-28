@@ -295,6 +295,47 @@
     updateSlider();
   }
 
+  /* ---------- captains: phone slider dots ----------
+     The roster is a CSS scroll-snap row on phones; this only adds the dots
+     that say which captain you are on and jump to one when tapped. */
+  const crew = document.querySelector('.crew');
+  if (crew) {
+    const crewCards = [...crew.children];
+    const dots = document.createElement('div');
+    dots.className = 'crew-dots';
+    const dotButtons = crewCards.map((card, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      const name = card.querySelector('.crew__name');
+      btn.setAttribute('aria-label', name ? name.textContent : String(i + 1));
+      btn.addEventListener('click', () => {
+        /* offsets run negative in RTL, which matches RTL scrollLeft */
+        crew.scrollTo({ left: card.offsetLeft - crewCards[0].offsetLeft, behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+      dots.appendChild(btn);
+      return btn;
+    });
+    crew.after(dots);
+
+    let crewTicking = false;
+    const updateDots = () => {
+      crewTicking = false;
+      const pos = Math.abs(crew.scrollLeft);
+      let active = 0;
+      crewCards.forEach((card, i) => {
+        if (Math.abs(card.offsetLeft - crewCards[0].offsetLeft) <= pos + card.offsetWidth / 2) active = i;
+      });
+      dotButtons.forEach((btn, i) => btn.setAttribute('aria-current', i === active ? 'true' : 'false'));
+    };
+    crew.addEventListener('scroll', () => {
+      if (crewTicking) return;
+      crewTicking = true;
+      requestAnimationFrame(updateDots);
+    }, { passive: true });
+    window.addEventListener('resize', updateDots);
+    updateDots();
+  }
+
   /* ---------- reels ----------
      Cards play muted while they are on screen and pause when they leave, so
      only the reels in view ever download. A click grows the card into a
