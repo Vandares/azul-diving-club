@@ -81,11 +81,12 @@
   if (rail) {
     const fill = rail.querySelector('.depth-rail__fill');
     const marks = [...rail.querySelectorAll('.depth-rail__marks li')];
-    const slider = document.getElementById('facilityTrack');
+    /* rows that run under the rail: the facilities slider and the reels */
+    const passers = ['facilityTrack', 'reelTrack'].map(id => document.getElementById(id)).filter(Boolean);
     /* English and Arabic pages share this list; each page only has the ids it
        uses (#features + #facilities here, #facilities + #services on /ar/), and
        missing ones drop out, so the marks still line up one-to-one. */
-    const sections = ['#hero', '#club', '#features', '#facilities', '#services', '#courses', '#captains', '#ascent']
+    const sections = ['#hero', '#club', '#features', '#facilities', '#services', '#reels', '#courses', '#captains', '#ascent']
       .map(sel => document.querySelector(sel))
       .filter(Boolean);
 
@@ -103,12 +104,14 @@
       });
       marks.forEach((m, i) => m.classList.toggle('is-active', i === activeIndex));
 
-      /* The facilities slider runs to the right edge of the screen, straight
-         under the rail — step the rail aside while the cards pass beneath it. */
-      if (slider) {
+      /* The facilities slider and the reels run under the rail at the right
+         edge — step the rail aside while either row passes beneath it. */
+      if (passers.length) {
         const r = rail.getBoundingClientRect();
-        const s = slider.getBoundingClientRect();
-        rail.classList.toggle('is-hidden', s.top < r.bottom && s.bottom > r.top);
+        rail.classList.toggle('is-hidden', passers.some(el => {
+          const s = el.getBoundingClientRect();
+          return s.top < r.bottom && s.bottom > r.top;
+        }));
       }
     };
 
@@ -165,6 +168,7 @@
     /* #facilities is the slider here but the benefits grid on /ar/ */
     { sel: '#facilities', value: document.getElementById('features') ? 0.52 : 0.36 },
     { sel: '#services',   value: 0.52 },
+    { sel: '#reels',      value: 0.61 },
     { sel: '#courses',    value: 0.70 },
     { sel: '#captains',   value: 1    },
     { sel: '#ascent',     value: 0    },
@@ -289,6 +293,170 @@
     }, { passive: true });
     window.addEventListener('resize', updateSlider);
     updateSlider();
+  }
+
+  /* ---------- reels ----------
+     Cards play muted while they are on screen and pause when they leave, so
+     only the reels in view ever download. A click grows the card into a
+     full-screen player with sound (FLIP from the card's own rectangle). */
+  const reelTrack = document.getElementById('reelTrack');
+  if (reelTrack) {
+    const reelSection = reelTrack.closest('.reels');
+    const reelItems = [...reelTrack.querySelectorAll('.reel')];
+    const reelCards = reelItems.map(li => li.querySelector('.reel__card'));
+    const reelVideos = reelCards.map(card => card.querySelector('video'));
+    const rtl = getComputedStyle(reelTrack).direction === 'rtl';
+
+    const enter = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      reelSection.classList.add('is-in');
+      enter.disconnect();
+    }, { threshold: 0.15 });
+    enter.observe(reelTrack);
+
+    const onScreen = new Set();
+    const autoplay = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target.querySelector('video');
+        if (entry.isIntersecting) {
+          onScreen.add(video);
+          if (!reduceMotion) video.play().catch(() => {});
+        } else {
+          onScreen.delete(video);
+          video.pause();
+        }
+      });
+    }, { threshold: 0.45 });
+    reelCards.forEach(card => autoplay.observe(card));
+
+    reelVideos.forEach(video => {
+      const bar = video.parentElement.querySelector('.reel__bar span');
+      video.addEventListener('timeupdate', () => {
+        if (video.duration) bar.style.transform = `scaleX(${(video.currentTime / video.duration).toFixed(4)})`;
+      });
+    });
+
+    /* tilt + glint, mouse only */
+    if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      reelCards.forEach(card => {
+        card.addEventListener('pointermove', e => {
+          const r = card.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width;
+          const y = (e.clientY - r.top) / r.height;
+          card.style.setProperty('--ry', ((x - 0.5) * 14).toFixed(2) + 'deg');
+          card.style.setProperty('--rx', ((0.5 - y) * 12).toFixed(2) + 'deg');
+          card.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
+          card.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
+        });
+        card.addEventListener('pointerleave', () => {
+          ['--rx', '--ry', '--gx', '--gy'].forEach(p => card.style.removeProperty(p));
+        });
+      });
+    }
+
+    /* scroll drift: odd and even cards slide against each other */
+    const wide = window.matchMedia('(min-width: 861px)');
+    let driftTicking = false;
+    const drift = () => {
+      driftTicking = false;
+      if (reduceMotion || !wide.matches) {
+        reelItems.forEach(li => { li.style.transform = ''; });
+        return;
+      }
+      const r = reelTrack.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > window.innerHeight) return;
+      const p = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight;
+      reelItems.forEach((li, i) => {
+        li.style.transform = `translate3d(0, ${(p * (i % 2 ? -1 : 1) * 46).toFixed(1)}px, 0)`;
+      });
+    };
+    document.addEventListener('scroll', () => {
+      if (driftTicking) return;
+      driftTicking = true;
+      requestAnimationFrame(drift);
+    }, { passive: true });
+    window.addEventListener('resize', drift);
+    drift();
+
+    /* full-screen player */
+    const viewer = document.getElementById('reelViewer');
+    const frame = viewer.querySelector('.reel-viewer__frame');
+    const big = frame.querySelector('video');
+    const closeBtn = viewer.querySelector('.reel-viewer__close');
+    let current = -1;
+    let returnFocus = null;
+    const ease = 'cubic-bezier(.16, 1, .3, 1)';
+
+    const flipFrom = rect => {
+      const to = frame.getBoundingClientRect();
+      return `translate(${rect.left - to.left}px, ${rect.top - to.top}px) scale(${rect.width / to.width}, ${rect.height / to.height})`;
+    };
+
+    const load = i => {
+      const small = reelVideos[i];
+      current = i;
+      big.poster = small.poster;
+      /* the muted card loop is a preview; with sound it starts from the top */
+      big.src = small.currentSrc || small.src;
+      big.muted = false;
+      big.play().catch(() => {});
+      small.pause();
+    };
+
+    const open = i => {
+      returnFocus = document.activeElement;
+      viewer.hidden = false;
+      document.body.style.overflow = 'hidden';
+      load(i);
+      if (!reduceMotion) {
+        frame.animate([{ transform: flipFrom(reelCards[i].getBoundingClientRect()), borderRadius: '20px' }, { transform: 'none' }],
+          { duration: 700, easing: ease });
+        viewer.querySelector('.reel-viewer__backdrop').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 450, easing: 'ease-out' });
+      }
+      closeBtn.focus({ preventScroll: true });
+    };
+
+    const close = async () => {
+      if (viewer.hidden) return;
+      big.pause();
+      if (!reduceMotion) {
+        const card = reelCards[current].getBoundingClientRect();
+        viewer.querySelector('.reel-viewer__backdrop').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, easing: 'ease-in', fill: 'forwards' });
+        await frame.animate([{ transform: 'none' }, { transform: flipFrom(card) }],
+          { duration: 520, easing: ease, fill: 'forwards' }).finished.catch(() => {});
+        frame.getAnimations().forEach(a => a.cancel());
+        viewer.querySelector('.reel-viewer__backdrop').getAnimations().forEach(a => a.cancel());
+      }
+      viewer.hidden = true;
+      document.body.style.overflow = '';
+      big.removeAttribute('src');
+      big.load();
+      reelVideos.forEach(v => { if (onScreen.has(v) && !reduceMotion) v.play().catch(() => {}); });
+      if (returnFocus) returnFocus.focus({ preventScroll: true });
+    };
+
+    const step = dir => {
+      const next = (current + dir + reelCards.length) % reelCards.length;
+      if (!reduceMotion) frame.animate([{ opacity: 0, transform: `translateX(${(rtl ? -dir : dir) * 40}px)` }, { opacity: 1, transform: 'none' }], { duration: 420, easing: ease });
+      load(next);
+    };
+
+    reelCards.forEach((card, i) => card.addEventListener('click', () => open(i)));
+    viewer.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', close));
+    viewer.querySelectorAll('[data-step]').forEach(btn => btn.addEventListener('click', () => step(Number(btn.dataset.step))));
+    document.addEventListener('keydown', e => {
+      if (viewer.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowRight') step(rtl ? -1 : 1);
+      else if (e.key === 'ArrowLeft') step(rtl ? 1 : -1);
+      else if (e.key === 'Tab') {
+        /* keep focus inside the player */
+        const focusables = [...viewer.querySelectorAll('button, video')].filter(el => el.offsetParent !== null);
+        const first = focusables[0], last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
   }
 
   /* ---------- caustics + bubbles canvas ---------- */

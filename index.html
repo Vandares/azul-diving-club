@@ -58,9 +58,10 @@
     <li data-depth="1"><span class="depth-rail__num">3M</span><span class="depth-rail__label">The Club</span></li>
     <li data-depth="2"><span class="depth-rail__num">8M</span><span class="depth-rail__label">Features</span></li>
     <li data-depth="3"><span class="depth-rail__num">12M</span><span class="depth-rail__label">Facilities</span></li>
-    <li data-depth="4"><span class="depth-rail__num">18M</span><span class="depth-rail__label">Courses</span></li>
-    <li data-depth="5"><span class="depth-rail__num">30M</span><span class="depth-rail__label">Captains</span></li>
-    <li data-depth="6"><span class="depth-rail__num">40M</span><span class="depth-rail__label">Ascent</span></li>
+    <li data-depth="4"><span class="depth-rail__num">15M</span><span class="depth-rail__label">Reels</span></li>
+    <li data-depth="5"><span class="depth-rail__num">18M</span><span class="depth-rail__label">Courses</span></li>
+    <li data-depth="6"><span class="depth-rail__num">30M</span><span class="depth-rail__label">Captains</span></li>
+    <li data-depth="7"><span class="depth-rail__num">40M</span><span class="depth-rail__label">Ascent</span></li>
   </ol>
 </aside>
 
@@ -378,6 +379,72 @@
     </ol>
 
     <div class="facility-progress" aria-hidden="true"><span id="facilityProgress"></span></div>
+  </section>
+
+  <!-- REELS -->
+  <section class="reels" id="reels">
+    <div class="section-head">
+      <p class="eyebrow reveal">15M — On Camera</p>
+      <h2 class="reveal">Life at Azul, straight from the water.</h2>
+      <p class="section-head__sub reveal">Meet the crew, learn the checks, and see what a day below the surface looks like. Tap any reel to watch it with sound.</p>
+    </div>
+
+    <ol class="reel-track" id="reelTrack" aria-label="Azul reels">
+      <li class="reel" style="--i: 0">
+        <button class="reel__card" type="button" aria-label="Play Meet the Captains with sound">
+          <video class="reel__video" src="assets/reel-1.mp4" poster="assets/reel-1.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+          <span class="reel__glare" aria-hidden="true"></span>
+          <span class="reel__meta" aria-hidden="true"><span class="reel__num">01</span><span class="reel__time">0:21</span></span>
+          <span class="reel__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+          <span class="reel__caption"><span class="reel__title">Meet the Captains</span><span class="reel__tag">The crew behind every dive</span></span>
+          <span class="reel__bar" aria-hidden="true"><span></span></span>
+        </button>
+      </li>
+      <li class="reel" style="--i: 1">
+        <button class="reel__card" type="button" aria-label="Play Freediving at Azul with sound">
+          <video class="reel__video" src="assets/reel-2.mp4" poster="assets/reel-2.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+          <span class="reel__glare" aria-hidden="true"></span>
+          <span class="reel__meta" aria-hidden="true"><span class="reel__num">02</span><span class="reel__time">0:48</span></span>
+          <span class="reel__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+          <span class="reel__caption"><span class="reel__title">Freediving at Azul</span><span class="reel__tag">One breath, open blue</span></span>
+          <span class="reel__bar" aria-hidden="true"><span></span></span>
+        </button>
+      </li>
+      <li class="reel" style="--i: 2">
+        <button class="reel__card" type="button" aria-label="Play Before You Descend with sound">
+          <video class="reel__video" src="assets/reel-3.mp4" poster="assets/reel-3.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+          <span class="reel__glare" aria-hidden="true"></span>
+          <span class="reel__meta" aria-hidden="true"><span class="reel__num">03</span><span class="reel__time">0:17</span></span>
+          <span class="reel__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+          <span class="reel__caption"><span class="reel__title">Before You Descend</span><span class="reel__tag">The captain’s safety check</span></span>
+          <span class="reel__bar" aria-hidden="true"><span></span></span>
+        </button>
+      </li>
+      <li class="reel" style="--i: 3">
+        <button class="reel__card" type="button" aria-label="Play A Day in the Water with sound">
+          <video class="reel__video" src="assets/reel-4.mp4" poster="assets/reel-4.jpg" muted loop playsinline preload="none" aria-hidden="true"></video>
+          <span class="reel__glare" aria-hidden="true"></span>
+          <span class="reel__meta" aria-hidden="true"><span class="reel__num">04</span><span class="reel__time">0:12</span></span>
+          <span class="reel__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+          <span class="reel__caption"><span class="reel__title">A Day in the Water</span><span class="reel__tag">Museum, reef and the first giant stride</span></span>
+          <span class="reel__bar" aria-hidden="true"><span></span></span>
+        </button>
+      </li>
+    </ol>
+
+    <div class="reel-viewer" id="reelViewer" role="dialog" aria-modal="true" aria-label="Reel player" hidden>
+      <div class="reel-viewer__backdrop" data-close></div>
+      <div class="reel-viewer__frame"><video playsinline controls></video></div>
+      <button class="reel-viewer__close" type="button" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <button class="reel-viewer__step" type="button" data-step="-1" aria-label="Previous reel">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <button class="reel-viewer__step" type="button" data-step="1" aria-label="Next reel">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
   </section>
 
   <!-- COURSES -->
