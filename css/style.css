@@ -1069,6 +1069,7 @@ section { position: relative; }
 }
 .reel__hint {
   letter-spacing: .06em;
+  white-space: nowrap;
   opacity: 0;
   transition: opacity .4s var(--ease);
 }
@@ -1125,7 +1126,8 @@ section { position: relative; }
 /* below 1025px the hero stacks: text first, then the deck */
 @media (max-width: 1024px) {
   .hero { flex-direction: column; align-items: stretch; justify-content: flex-end; }
-  .hero__content { padding-bottom: 3rem; }
+  /* the hero runs taller than the screen here, so clear the fixed header */
+  .hero__content { padding-top: 7rem; padding-bottom: 3rem; }
   .hero__reels {
     position: relative;
     top: auto;
@@ -1134,11 +1136,19 @@ section { position: relative; }
     padding-bottom: 7rem;
   }
   .reel-deck {
-    width: min(62vw, 300px);
+    width: min(70vw, 320px);
     /* nudge away from the fan so the deck as a whole looks centred */
     translate: calc(var(--side) * -7%) 0;
   }
   .scroll-cue { display: none; }
+}
+
+/* phones: the header already carries Book a Dive, so the hero goes straight
+   from the copy to the reels */
+@media (max-width: 700px) {
+  .hero__actions { display: none; }
+  .reel__meta { font-size: .64rem; letter-spacing: .06em; }
+  .reel__num { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
