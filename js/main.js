@@ -82,7 +82,7 @@
     const fill = rail.querySelector('.depth-rail__fill');
     const marks = [...rail.querySelectorAll('.depth-rail__marks li')];
     /* rows that run under the rail: the facilities slider and the reels */
-    const passers = ['facilityTrack', 'reelTrack'].map(id => document.getElementById(id)).filter(Boolean);
+    const passers = ['facilityTrack', 'reelDeck'].map(id => document.getElementById(id)).filter(Boolean);
     /* English and Arabic pages share this list; each page only has the ids it
        uses (#features + #facilities here, #facilities + #services on /ar/), and
        missing ones drop out, so the marks still line up one-to-one. */
@@ -336,168 +336,167 @@
     updateDots();
   }
 
-  /* ---------- reels ----------
-     Cards play muted while they are on screen and pause when they leave, so
-     only the reels in view ever download. A click grows the card into a
-     full-screen player with sound (FLIP from the card's own rectangle). */
-  const reelTrack = document.getElementById('reelTrack');
-  if (reelTrack) {
-    const reelSection = reelTrack.closest('.reels');
-    const reelItems = [...reelTrack.querySelectorAll('.reel')];
-    const reelCards = reelItems.map(li => li.querySelector('.reel__card'));
-    const reelVideos = reelCards.map(card => card.querySelector('video'));
-    const rtl = getComputedStyle(reelTrack).direction === 'rtl';
+  /* ---------- reels deck ----------
+     The front card plays; the others wait fanned out behind it. Flipping
+     throws the front card off to the side and lets it settle at the back.
+     A reel that finishes flips to the next one on its own. Sound starts off
+     (browsers only autoplay muted) and a tap on the card turns it on. */
+  const deck = document.getElementById('reelDeck');
+  if (deck) {
+    const reelSection = deck.closest('.reels');
+    const cards = [...deck.querySelectorAll('.reel')];
+    const videos = cards.map(card => card.querySelector('video'));
+    const side = getComputedStyle(deck).direction === 'rtl' ? -1 : 1;
+    const countEl = document.getElementById('reelCount');
+    const soundBtn = document.querySelector('[data-reel-sound]');
+    let order = cards.map((_, i) => i); /* order[0] is the front card */
+    let muted = true;
+    let inView = false;
+    let busy = false;
 
-    const enter = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      reelSection.classList.add('is-in');
-      enter.disconnect();
-    }, { threshold: 0.15 });
-    enter.observe(reelTrack);
+    const paintSound = () => {
+      deck.classList.toggle('is-muted', muted);
+      if (soundBtn) soundBtn.setAttribute('aria-pressed', String(!muted));
+    };
 
-    const onScreen = new Set();
-    const autoplay = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        const video = entry.target.querySelector('video');
-        if (entry.isIntersecting) {
-          onScreen.add(video);
-          if (!reduceMotion) video.play().catch(() => {});
-        } else {
-          onScreen.delete(video);
+    const sync = () => {
+      videos.forEach((video, i) => {
+        if (i !== order[0]) {
           video.pause();
+          video.muted = true;
+          return;
         }
+        video.muted = muted;
+        if (!inView) { video.pause(); return; }
+        video.play().catch(() => {
+          /* sound refused: fall back to muted rather than not playing */
+          if (!video.muted) { muted = true; video.muted = true; paintSound(); video.play().catch(() => {}); }
+        });
       });
-    }, { threshold: 0.45 });
-    reelCards.forEach(card => autoplay.observe(card));
+    };
 
-    reelVideos.forEach(video => {
+    const layout = () => {
+      order.forEach((ci, pos) => {
+        const card = cards[ci];
+        card.style.setProperty('--pos', pos);
+        card.classList.toggle('is-front', pos === 0);
+        card.setAttribute('aria-hidden', pos === 0 ? 'false' : 'true');
+      });
+      if (countEl) countEl.textContent = String(order[0] + 1).padStart(2, '0');
+      sync();
+    };
+
+    const fling = dir => `translateX(${dir * 135}%) rotate(${dir * 18}deg)`;
+    const FLING_MS = reduceMotion ? 0 : 360;
+
+    /* step 1 = next, -1 = previous; throwDir is the side the card leaves by */
+    const go = (step, throwDir = -side * step) => {
+      if (busy) return;
+      busy = true;
+      if (step > 0) {
+        const out = cards[order[0]];
+        videos[order[0]].pause();
+        videos[order[0]].currentTime = 0;
+        order = [...order.slice(1), order[0]];
+        out.style.zIndex = 20;
+        out.style.transition = `transform ${FLING_MS}ms cubic-bezier(.5, 0, .75, 0)`;
+        out.style.transform = fling(throwDir);
+        layout();
+        setTimeout(() => {
+          /* drop behind the others first, then glide into the back slot */
+          out.style.zIndex = '';
+          out.style.transition = '';
+          out.style.transform = '';
+          busy = false;
+        }, FLING_MS);
+      } else {
+        const front = cards[order[0]];
+        front.style.transform = '';
+        videos[order[0]].pause();
+        const back = cards[order[order.length - 1]];
+        order = [order[order.length - 1], ...order.slice(0, -1)];
+        back.style.transition = 'none';
+        back.style.zIndex = 20;
+        back.style.transform = fling(throwDir);
+        void back.offsetWidth;
+        back.style.transition = '';
+        layout();
+        requestAnimationFrame(() => {
+          back.style.transform = '';
+          setTimeout(() => { back.style.zIndex = ''; busy = false; }, reduceMotion ? 0 : 450);
+        });
+      }
+    };
+
+    const toggleSound = () => {
+      muted = !muted;
+      paintSound();
+      sync();
+    };
+
+    videos.forEach(video => {
       const bar = video.parentElement.querySelector('.reel__bar span');
       video.addEventListener('timeupdate', () => {
         if (video.duration) bar.style.transform = `scaleX(${(video.currentTime / video.duration).toFixed(4)})`;
       });
+      video.addEventListener('ended', () => { if (video === videos[order[0]]) go(1); });
     });
 
-    /* tilt + glint, mouse only */
-    if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      reelCards.forEach(card => {
-        card.addEventListener('pointermove', e => {
-          const r = card.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width;
-          const y = (e.clientY - r.top) / r.height;
-          card.style.setProperty('--ry', ((x - 0.5) * 14).toFixed(2) + 'deg');
-          card.style.setProperty('--rx', ((0.5 - y) * 12).toFixed(2) + 'deg');
-          card.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
-          card.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
-        });
-        card.addEventListener('pointerleave', () => {
-          ['--rx', '--ry', '--gx', '--gy'].forEach(p => card.style.removeProperty(p));
-        });
-      });
-    }
-
-    /* scroll drift: odd and even cards slide against each other */
-    const wide = window.matchMedia('(min-width: 861px)');
-    let driftTicking = false;
-    const drift = () => {
-      driftTicking = false;
-      if (reduceMotion || !wide.matches) {
-        reelItems.forEach(li => { li.style.transform = ''; });
-        return;
-      }
-      const r = reelTrack.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > window.innerHeight) return;
-      const p = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight;
-      reelItems.forEach((li, i) => {
-        li.style.transform = `translate3d(0, ${(p * (i % 2 ? -1 : 1) * 46).toFixed(1)}px, 0)`;
-      });
-    };
-    document.addEventListener('scroll', () => {
-      if (driftTicking) return;
-      driftTicking = true;
-      requestAnimationFrame(drift);
-    }, { passive: true });
-    window.addEventListener('resize', drift);
-    drift();
-
-    /* full-screen player */
-    const viewer = document.getElementById('reelViewer');
-    const frame = viewer.querySelector('.reel-viewer__frame');
-    const big = frame.querySelector('video');
-    const closeBtn = viewer.querySelector('.reel-viewer__close');
-    let current = -1;
-    let returnFocus = null;
-    const ease = 'cubic-bezier(.16, 1, .3, 1)';
-
-    const flipFrom = rect => {
-      const to = frame.getBoundingClientRect();
-      return `translate(${rect.left - to.left}px, ${rect.top - to.top}px) scale(${rect.width / to.width}, ${rect.height / to.height})`;
-    };
-
-    const load = i => {
-      const small = reelVideos[i];
-      current = i;
-      big.poster = small.poster;
-      /* the muted card loop is a preview; with sound it starts from the top */
-      big.src = small.currentSrc || small.src;
-      big.muted = false;
-      big.play().catch(() => {});
-      small.pause();
-    };
-
-    const open = i => {
-      returnFocus = document.activeElement;
-      viewer.hidden = false;
-      document.body.style.overflow = 'hidden';
-      load(i);
-      if (!reduceMotion) {
-        frame.animate([{ transform: flipFrom(reelCards[i].getBoundingClientRect()), borderRadius: '20px' }, { transform: 'none' }],
-          { duration: 700, easing: ease });
-        viewer.querySelector('.reel-viewer__backdrop').animate([{ opacity: 0 }, { opacity: 1 }], { duration: 450, easing: 'ease-out' });
-      }
-      closeBtn.focus({ preventScroll: true });
-    };
-
-    const close = async () => {
-      if (viewer.hidden) return;
-      big.pause();
-      if (!reduceMotion) {
-        const card = reelCards[current].getBoundingClientRect();
-        viewer.querySelector('.reel-viewer__backdrop').animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, easing: 'ease-in', fill: 'forwards' });
-        await frame.animate([{ transform: 'none' }, { transform: flipFrom(card) }],
-          { duration: 520, easing: ease, fill: 'forwards' }).finished.catch(() => {});
-        frame.getAnimations().forEach(a => a.cancel());
-        viewer.querySelector('.reel-viewer__backdrop').getAnimations().forEach(a => a.cancel());
-      }
-      viewer.hidden = true;
-      document.body.style.overflow = '';
-      big.removeAttribute('src');
-      big.load();
-      reelVideos.forEach(v => { if (onScreen.has(v) && !reduceMotion) v.play().catch(() => {}); });
-      if (returnFocus) returnFocus.focus({ preventScroll: true });
-    };
-
-    const step = dir => {
-      const next = (current + dir + reelCards.length) % reelCards.length;
-      if (!reduceMotion) frame.animate([{ opacity: 0, transform: `translateX(${(rtl ? -dir : dir) * 40}px)` }, { opacity: 1, transform: 'none' }], { duration: 420, easing: ease });
-      load(next);
-    };
-
-    reelCards.forEach((card, i) => card.addEventListener('click', () => open(i)));
-    viewer.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', close));
-    viewer.querySelectorAll('[data-step]').forEach(btn => btn.addEventListener('click', () => step(Number(btn.dataset.step))));
-    document.addEventListener('keydown', e => {
-      if (viewer.hidden) return;
-      if (e.key === 'Escape') close();
-      else if (e.key === 'ArrowRight') step(rtl ? -1 : 1);
-      else if (e.key === 'ArrowLeft') step(rtl ? 1 : -1);
-      else if (e.key === 'Tab') {
-        /* keep focus inside the player */
-        const focusables = [...viewer.querySelectorAll('button, video')].filter(el => el.offsetParent !== null);
-        const first = focusables[0], last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
+    /* drag / swipe the front card; a press without movement toggles sound */
+    let drag = null;
+    deck.addEventListener('pointerdown', e => {
+      const front = cards[order[0]];
+      if (busy || !front.contains(e.target) || e.button > 0) return;
+      drag = { id: e.pointerId, x: e.clientX, dx: 0, moved: false, card: front };
+      front.setPointerCapture(e.pointerId);
     });
+    deck.addEventListener('pointermove', e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      drag.dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(drag.dx) > 6) {
+        drag.moved = true;
+        drag.card.classList.add('is-dragging');
+      }
+      if (drag.moved) drag.card.style.transform = `translateX(${drag.dx}px) rotate(${drag.dx / 16}deg)`;
+    });
+    const endDrag = e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const { dx, moved, card } = drag;
+      drag = null;
+      card.classList.remove('is-dragging');
+      if (!moved) { if (e.type === 'pointerup') toggleSound(); return; }
+      if (Math.abs(dx) > 70) {
+        /* throwing the card away from the fan reveals the next reel */
+        const dir = Math.sign(dx);
+        go(dir === -side ? 1 : -1, dir);
+      } else {
+        card.style.transform = '';
+      }
+    };
+    deck.addEventListener('pointerup', endDrag);
+    deck.addEventListener('pointercancel', endDrag);
+
+    document.querySelectorAll('[data-reel-step]').forEach(btn => {
+      btn.addEventListener('click', () => go(Number(btn.dataset.reelStep)));
+    });
+    if (soundBtn) soundBtn.addEventListener('click', toggleSound);
+    deck.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(side > 0 ? 1 : -1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); go(side > 0 ? -1 : 1); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSound(); }
+    });
+
+    new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting;
+      if (inView && !reelSection.classList.contains('is-in')) {
+        reelSection.classList.add('is-in');
+        setTimeout(() => reelSection.classList.add('is-settled'), 1400);
+      }
+      sync();
+    }, { threshold: 0.35 }).observe(deck);
+
+    paintSound();
+    layout();
   }
 
   /* ---------- caustics + bubbles canvas ---------- */

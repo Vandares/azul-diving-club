@@ -937,85 +937,100 @@ section { position: relative; }
 }
 
 /* ==========================================================================
-   Reels — vertical video cards
+   Reels — a deck of vertical video cards
 
-   Each card rises out of the dark with a wipe from below, one after another,
-   then tilts toward the pointer with a glint that follows it. Entrance runs on
-   the individual translate / scale properties and the tilt on transform, so
-   the two never fight over the same value.
+   One reel plays at the front; the rest wait fanned out behind it. Flipping
+   (swipe, drag or the arrows) throws the front card off to the side and lets
+   it settle at the back of the deck. --pos is each card's place in the deck
+   (0 is the front) and is set from main.js.
    ========================================================================== */
 
 .reels {
   background:
-    radial-gradient(60% 50% at 50% 55%, rgba(79,199,214,.12), transparent 70%),
+    radial-gradient(50% 55% at 72% 50%, rgba(79,199,214,.13), transparent 70%),
     linear-gradient(180deg, var(--ink) 0%, var(--azul-deep) 50%, var(--ink) 100%);
-  padding: 8rem 0 10rem;
+  padding: 8rem 0 9rem;
   overflow: hidden;
 }
-.reels .section-head { margin-bottom: 4rem; }
-
-.reel-track {
-  list-style: none;
+.reels__inner {
   max-width: 1360px;
   margin: 0 auto;
   padding: 0 var(--edge);
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(1rem, 2vw, 1.75rem);
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2.5rem, 6vw, 6rem);
+  align-items: center;
 }
-/* staggered rhythm: even cards sit lower, and drift the other way on scroll */
-.reel:nth-child(even) { margin-top: 4.5rem; }
-.reel { will-change: transform; }
+.reels__intro h2 { max-width: 16ch; margin-bottom: 1.25rem; }
+.reels__intro p { max-width: 44ch; font-size: 1.05rem; }
 
-.reel__card {
-  --d: calc(var(--i, 0) * 140ms);
+.reels__controls {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-top: 2.5rem;
+}
+.reels__count {
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  letter-spacing: .12em;
+  color: var(--foam-dim);
+  margin-inline-end: .75rem;
+  min-width: 5.5ch;
+}
+.reels__count b { color: var(--foam); font-weight: 500; }
+/* the counter reads 01 / 04 in both languages, and the speaker is not an arrow */
+[dir="rtl"] .reels__count { direction: ltr; unicode-bidi: isolate; }
+.reels__sound .i-on { display: none; }
+.reels__sound[aria-pressed="true"] .i-on { display: block; }
+.reels__sound[aria-pressed="true"] .i-off { display: none; }
+.reels__sound[aria-pressed="true"] { border-color: var(--current); background: rgba(79,199,214,.14); }
+
+/* ---------- the deck ---------- */
+
+.reel-deck {
+  --side: 1;
   position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: 9 / 16;
+  list-style: none;
+  margin: 0;
   padding: 0;
+  width: clamp(250px, 24vw, 330px);
+  aspect-ratio: 9 / 16;
+  justify-self: center;
+  /* leave room on the fanned side so the deck as a whole looks centred */
+  translate: -9% 0;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+[dir="rtl"] .reel-deck { --side: -1; translate: 9% 0; }
+.reel-deck:focus-visible .reel.is-front { outline: 2px solid var(--current); outline-offset: 4px; }
+
+.reel {
+  --pos: 0;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  color: inherit;
-  text-align: start;
-  background: var(--azul-deep);
-  border: 1px solid rgba(244,241,232,.1);
   border-radius: 20px;
-  box-shadow: 0 34px 60px -34px rgba(3,12,20,.95);
-  cursor: pointer;
-  /* entrance start state */
-  opacity: 0;
-  translate: 0 140px;
-  scale: .86;
-  clip-path: inset(100% 0 0 0 round 20px);
-  /* tilt */
-  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
-  transition:
-    opacity .9s var(--ease-rise) var(--d),
-    translate 1.3s var(--ease-rise) var(--d),
-    scale 1.3s var(--ease-rise) var(--d),
-    clip-path 1.4s var(--ease-rise) var(--d),
-    transform .5s var(--ease-settle),
-    box-shadow .5s var(--ease-settle),
-    border-color .5s var(--ease),
-    filter .5s var(--ease);
+  background: var(--azul-deep);
+  border: 1px solid rgba(244,241,232,.12);
+  box-shadow: 0 34px 60px -30px rgba(3,12,20,.95);
+  transform-origin: 50% 110%;
+  transform:
+    translateX(calc(var(--side) * var(--pos) * 11%))
+    rotate(calc(var(--side) * var(--pos) * 4deg))
+    scale(calc(1 - var(--pos) * .07));
+  z-index: calc(10 - var(--pos));
+  filter: brightness(calc(1 - var(--pos) * .2)) saturate(calc(1 - var(--pos) * .18));
+  transition: transform .75s var(--ease-rise), filter .75s var(--ease), opacity .9s var(--ease-rise), translate 1.1s var(--ease-rise);
 }
-.reels.is-in .reel__card {
-  opacity: 1;
-  translate: 0 0;
-  scale: 1;
-  clip-path: inset(0 0 0 0 round 20px);
-}
-.reel__card:hover,
-.reel__card:focus-visible {
-  --lift: -10px;
-  border-color: rgba(79,199,214,.5);
-  box-shadow: 0 44px 70px -30px rgba(3,12,20,.95), 0 0 0 1px rgba(79,199,214,.18);
-}
-/* the cards you are not looking at fall back into the water */
-@media (hover: hover) {
-  .reel-track:hover .reel__card:not(:hover) { filter: saturate(.55) brightness(.62); }
-}
+.reel.is-front { cursor: grab; }
+.reel.is-dragging { cursor: grabbing; transition: none; }
+
+/* entrance: the deck rises out of the dark, back cards first, then fans out */
+.reels:not(.is-in) .reel { opacity: 0; translate: 0 120px; transform: none; }
+.reels.is-in:not(.is-settled) .reel { transition-delay: calc((3 - var(--pos)) * 110ms); }
 
 .reel__video {
   position: absolute;
@@ -1023,14 +1038,9 @@ section { position: relative; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  scale: 1.18;
-  transition: scale 1.8s var(--ease-rise) var(--d);
+  pointer-events: none;
 }
-.reels.is-in .reel__video { scale: 1; }
-.reel__card:hover .reel__video { scale: 1.05; transition-delay: 0s; }
-
-/* shade top and bottom so the labels stay legible over any frame */
-.reel__card::after {
+.reel::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1040,70 +1050,36 @@ section { position: relative; }
   pointer-events: none;
 }
 
-.reel__glare {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255,255,255,.28), transparent 45%);
-  mix-blend-mode: soft-light;
-  opacity: 0;
-  transition: opacity .4s var(--ease);
-  pointer-events: none;
-}
-.reel__card:hover .reel__glare { opacity: 1; }
-
 .reel__meta {
   position: absolute;
   top: 1.1rem;
   inset-inline: 1.1rem;
   z-index: 3;
   display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: .5rem;
   font-family: var(--font-mono);
   font-size: .72rem;
   letter-spacing: .12em;
   color: var(--foam);
 }
-.reel__time {
+.reel__time,
+.reel__hint {
   padding: .2rem .55rem;
   border-radius: 999px;
   background: rgba(7,24,38,.5);
   backdrop-filter: blur(6px);
 }
-
-.reel__play {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 3;
-  width: 68px;
-  height: 68px;
-  margin: -34px 0 0 -34px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: rgba(244,241,232,.16);
-  border: 1px solid rgba(244,241,232,.4);
-  backdrop-filter: blur(8px);
+.reel__hint {
+  letter-spacing: .06em;
   opacity: 0;
-  scale: .6;
-  transition: opacity .4s var(--ease), scale .5s var(--ease-rise);
+  transition: opacity .4s var(--ease);
 }
-.reel__play svg { width: 24px; height: 24px; fill: var(--foam); margin-left: 3px; }
-.reel__play::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 50%;
-  border: 1px solid rgba(244,241,232,.5);
-  animation: reel-ping 1.8s var(--ease) infinite;
-}
-.reel__card:hover .reel__play,
-.reel__card:focus-visible .reel__play { opacity: 1; scale: 1; }
-
-@keyframes reel-ping {
-  0%   { transform: scale(1);   opacity: .8; }
-  100% { transform: scale(1.7); opacity: 0; }
+.reel-deck.is-muted .reel.is-front .reel__hint { opacity: 1; animation: reel-hint 2.4s var(--ease) infinite; }
+@keyframes reel-hint {
+  0%, 100% { background: rgba(7,24,38,.5); }
+  50%      { background: rgba(79,199,214,.35); }
 }
 
 .reel__caption {
@@ -1114,13 +1090,10 @@ section { position: relative; }
   display: flex;
   flex-direction: column;
   gap: .35rem;
-  translate: 0 6px;
-  transition: translate .5s var(--ease-settle);
 }
-.reel__card:hover .reel__caption { translate: 0 0; }
 .reel__title {
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 1.5vw, 1.45rem);
+  font-size: clamp(1.2rem, 1.6vw, 1.5rem);
   font-weight: 500;
   line-height: 1.15;
   color: var(--foam);
@@ -1147,101 +1120,30 @@ section { position: relative; }
 }
 [dir="rtl"] .reel__bar span { transform-origin: right; }
 
-/* ---------- full-screen player ---------- */
-
-.reel-viewer {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: grid;
-  place-items: center;
-}
-.reel-viewer[hidden] { display: none; }
-.reel-viewer__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(3,12,20,.86);
-  backdrop-filter: blur(14px);
-}
-.reel-viewer__frame {
-  position: relative;
-  height: min(88vh, 900px);
-  aspect-ratio: 9 / 16;
-  max-width: calc(100vw - 2rem);
-  border-radius: 20px;
-  overflow: hidden;
-  background: #000;
-  box-shadow: 0 40px 120px -20px rgba(0,0,0,.8);
-  transform-origin: 0 0;
-}
-.reel-viewer__frame video { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-.reel-viewer__close,
-.reel-viewer__step {
-  position: absolute;
-  z-index: 2;
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  color: var(--foam);
-  border: 1px solid rgba(244,241,232,.25);
-  background: rgba(7,24,38,.5);
-  transition: border-color .3s var(--ease), background .3s var(--ease), transform .2s var(--ease);
-}
-.reel-viewer__close:hover,
-.reel-viewer__step:hover { border-color: var(--current); background: rgba(79,199,214,.14); }
-.reel-viewer__close:active,
-.reel-viewer__step:active { transform: scale(.94); }
-.reel-viewer__close svg,
-.reel-viewer__step svg {
-  width: 20px; height: 20px;
-  fill: none; stroke: currentColor; stroke-width: 1.8;
-  stroke-linecap: round; stroke-linejoin: round;
-}
-.reel-viewer__close { top: 1.5rem; right: 1.5rem; }
-.reel-viewer__step { top: 50%; margin-top: -26px; }
-.reel-viewer__step[data-step="-1"] { left: max(1.5rem, calc(50% - min(44vh, 450px) * 9 / 16 - 5rem)); }
-.reel-viewer__step[data-step="1"]  { right: max(1.5rem, calc(50% - min(44vh, 450px) * 9 / 16 - 5rem)); }
-[dir="rtl"] .reel-viewer__close { right: auto; left: 1.5rem; }
-[dir="rtl"] .reel-viewer__step[data-step="-1"] { left: auto; right: max(1.5rem, calc(50% - min(44vh, 450px) * 9 / 16 - 5rem)); }
-[dir="rtl"] .reel-viewer__step[data-step="1"]  { right: auto; left: max(1.5rem, calc(50% - min(44vh, 450px) * 9 / 16 - 5rem)); }
-[dir="rtl"] .reel-viewer__step svg { transform: scaleX(-1); }
-
-/* ---------- small screens: a swipeable row ---------- */
-
 @media (max-width: 860px) {
   .reels { padding: 6rem 0 7rem; }
-  .reels .section-head { margin-bottom: 2.5rem; }
-  .reel-track {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--edge);
-    overscroll-behavior-x: contain;
-    padding-bottom: 1rem;
-    scrollbar-width: none;
-  }
-  .reel-track::-webkit-scrollbar { display: none; }
-  .reel { flex: 0 0 64%; scroll-snap-align: start; }
-  .reel:nth-child(even) { margin-top: 0; }
-  .reel__play { opacity: 1; scale: .85; }
-  .reel-viewer__step { display: none; }
-  .reel-viewer__frame { height: auto; width: calc(100vw - 2rem); max-height: 86vh; }
-}
-@media (max-width: 500px) {
-  .reel { flex-basis: 76%; }
+  .reels__inner { grid-template-columns: 1fr; gap: 3rem; }
+  .reel-deck { width: min(64vw, 300px); }
+  /* controls sit under the deck, where the thumb is */
+  .reels__controls { margin-top: 0; justify-content: center; }
+  .reels__intro { display: contents; }
+  .reels__intro > .reels__controls { order: 2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reel__card,
-  .reels.is-in .reel__card { opacity: 1; translate: none; scale: none; clip-path: none; transition: none; }
-  .reel__video { scale: none; transition: none; }
-  .reel__play::before { animation: none; }
+  .reel,
+  .reels:not(.is-in) .reel { transition: none; opacity: 1; translate: none; }
+  .reels:not(.is-in) .reel {
+    transform:
+      translateX(calc(var(--side) * var(--pos) * 11%))
+      rotate(calc(var(--side) * var(--pos) * 4deg))
+      scale(calc(1 - var(--pos) * .07));
+  }
+  .reel-deck.is-muted .reel.is-front .reel__hint { animation: none; }
 }
 
-[lang="ar"] .reel__meta { letter-spacing: normal; }
+[lang="ar"] .reel__meta,
+[lang="ar"] .reels__count { letter-spacing: normal; }
 [lang="ar"] .reel__title { font-weight: 600; line-height: 1.35; }
 
 /* ==========================================================================
@@ -1843,3 +1745,4 @@ section { position: relative; }
    the leading corner, and the progress thumb starts from the right */
 [dir="rtl"] .slider-btn svg { transform: scaleX(-1); }
 [dir="rtl"] .facility__num { left: auto; right: 1.25rem; }
+[dir="rtl"] .reels__sound svg { transform: none; }
